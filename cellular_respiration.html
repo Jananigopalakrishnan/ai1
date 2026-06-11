@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cellular Respiration: The Interactive Engine of Life</title>
+    <!-- Tailwind CSS for modern glassmorphic styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX for beautiful math equations -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #020617;
+        }
+        h1, h2, h3, .font-title {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .glow-green {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+        }
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+        .glow-gold {
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.35);
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        /* Rotational animation for ATP Synthase */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 12s linear infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950 overflow-x-hidden">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 px-4 py-3 sm:px-6">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
+                    <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-emerald-400 uppercase tracking-widest">OpenStax Biology 2e Companion</span>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Cellular Respiration Laboratory
+                    </h1>
+                </div>
+            </div>
+            
+            <!-- Overall Respiration Progress -->
+            <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
+                <div class="hidden md:block text-right">
+                    <span class="text-xs text-slate-400">Lesson Progress</span>
+                    <div class="text-sm font-semibold text-emerald-400" id="progress-text">Intro: Cell Powerhouse</div>
+                </div>
+                <div class="w-24 sm:w-32 bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700/50">
+                    <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 to-cyan-500 h-full transition-all duration-500" style="width: 10%"></div>
+                </div>
+                <button onclick="readAloudText()" class="p-2 hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-800 hover:border-slate-700 transition" title="Read Aloud current steps">
+                    <i id="voice-icon" class="fa-solid fa-volume-high text-emerald-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT COLUMN: Canvas / Interactive Graphics (Sticky Desktop) -->
+        <section class="lg:col-span-7 xl:col-span-8 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 sm:p-6 backdrop-blur lg:sticky lg:top-24 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-sm font-semibold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                    <span id="canvas-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="interactive-canvas-title">Cellular Location & Structure Map</span>
+                </h2>
+                <div class="flex gap-2">
+                    <span class="px-2 py-0.5 bg-slate-800 text-xs text-slate-400 rounded border border-slate-700">WebGL Fallback Vector</span>
+                    <button onclick="resetCurrentVisuals()" class="p-1 hover:bg-slate-800 rounded text-xs text-slate-400 hover:text-slate-200 transition" title="Reset Scene State">
+                        <i class="fa-solid fa-rotate"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Interactive Render Window -->
+            <div class="relative bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center min-h-[380px] sm:min-h-[460px] max-h-[500px]" id="canvas-container">
+                
+                <!-- STEP 0: Mitochondria Region Exploration Map -->
+                <div id="scene-intro" class="w-full h-full flex flex-col justify-between p-6 relative">
+                    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.06),transparent_70%)]"></div>
+                    <div class="relative z-10 w-full flex justify-center py-4">
+                        <!-- Custom Interactive Mitochondrion SVG -->
+                        <svg viewBox="0 0 800 400" class="w-full max-h-[300px] drop-shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+                            <defs>
+                                <radialGradient id="matrixGrad" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stop-color="#042f2e" />
+                                    <stop offset="100%" stop-color="#115e59" />
+                                </radialGradient>
+                                <linearGradient id="innerMemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#10b981" />
+                                    <stop offset="100%" stop-color="#06b6d4" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Cytoplasm Field -->
+                            <rect x="10" y="10" width="780" height="380" rx="20" fill="none" stroke="#334155" stroke-dasharray="8 6" stroke-width="2" class="cursor-pointer transition-all hover:stroke-slate-500" onclick="showMitoRegion('cytoplasm')"/>
+                            <text x="50" y="45" fill="#94a3b8" font-size="14" font-weight="bold" letter-spacing="1">CYTOPLASM (Anaerobic Glycolysis Space)</text>
+                            
+                            <!-- Mitochondrion Outer Membrane -->
+                            <ellipse cx="400" cy="200" rx="300" ry="150" fill="#020617" stroke="#475569" stroke-width="6" class="cursor-pointer transition hover:stroke-indigo-400" onclick="showMitoRegion('outer')"/>
+                            
+                            <!-- Intermembrane Space Area -->
+                            <ellipse cx="400" cy="200" rx="288" ry="138" fill="none" stroke="#f59e0b" stroke-dasharray="4 4" stroke-width="2" class="cursor-pointer transition hover:stroke-amber-400" onclick="showMitoRegion('intermembrane')"/>
+                            
+                            <!-- Inner Membrane with Cristae foldings -->
+                            <path d="M 120,200 
+                                     C 150,150 160,250 180,200 
+                                     C 200,100 230,300 250,200 
+                                     C 270,80  300,320 320,200 
+                                     C 340,110 370,290 390,200 
+                                     C 410,90  440,310 460,200 
+                                     C 480,100 510,300 530,200 
+                                     C 550,120 580,280 600,200 
+                                     C 620,140 650,260 680,200
+                                     " 
+                                  fill="none" stroke="url(#innerMemGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+                                  class="cursor-pointer transition hover:scale-105" onclick="showMitoRegion('inner')"/>
+
+                            <!-- Matrix Area Fill Behind -->
+                            <path d="M 120,200 
+                                     C 150,150 160,250 180,200 
+                                     C 200,100 230,300 250,200 
+                                     C 270,80  300,320 320,200 
+                                     C 340,110 370,290 390,200 
+                                     C 410,90  440,310 460,200 
+                                     C 480,100 510,300 530,200 
+                                     C 550,120 580,280 600,200 
+                                     C 620,140 650,260 680,200
+                                     " 
+                                  fill="#115e59" fill-opacity="0.3" class="cursor-pointer" onclick="showMitoRegion('matrix')"/>
+                            
+                            <!-- Labels on SVG -->
+                            <text x="400" y="200" fill="#2dd4bf" font-size="16" font-weight="bold" text-anchor="middle" letter-spacing="1" class="cursor-pointer" onclick="showMitoRegion('matrix')">MITOCHONDRIAL MATRIX</text>
+                            <text x="400" y="325" fill="#fb7185" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="1">Outer Membrane</text>
+                            <text x="250" y="90" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">Inner Membrane (Cristae)</text>
+                            <text x="560" y="110" fill="#fbbf24" font-size="12" font-weight="bold" text-anchor="middle">Intermembrane Space</text>
+                        </svg>
+                    </div>
+                    <div id="mitochondria-details-box" class="bg-slate-900 border border-slate-800 p-3.5 rounded-lg text-sm text-center">
+                        <span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-info"></i> Click on any structural area</span> of the cell map above to reveal its anatomical function in cellular respiration!
+                    </div>
+                </div>
+
+                <!-- STEP 1: Glycolysis Splits Glucose -->
+                <div id="scene-glycolysis" class="hidden w-full h-full flex flex-col justify-between p-6 relative">
+                    <div class="text-center text-xs text-slate-400">Interactive: Click the scissors or tap "Split" to execute the Energy Payoff phase.</div>
+                    
+                    <div class="flex items-center justify-center gap-12 my-auto relative">
+                        <!-- Six-Carbon Glucose Molecule -->
+                        <div id="glucose-chain" class="flex items-center gap-2 transition duration-500">
+                            <span class="carbon-node w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-sm border-2 border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]">C</span>
+                            <span class="carbon-node w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-sm border-2 border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]">C</span>
+                            <span class="carbon-node w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-sm border-2 border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]">C</span>
+                            
+                            <!-- Splitting point / Scissors Button -->
+                            <button id="split-btn" onclick="splitGlucoseAction()" class="mx-2 p-3 bg-red-600 hover:bg-red-500 text-white rounded-full border-2 border-red-300 shadow-lg hover:scale-110 active:scale-95 transition-all flex items-center justify-center z-10" title="Split Glucose with Aldolase">
+                                <i class="fa-solid fa-scissors animate-bounce"></i>
+                            </button>
+                            
+                            <span class="carbon-node w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-sm border-2 border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]">C</span>
+                            <span class="carbon-node w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-sm border-2 border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]">C</span>
+                            <span class="carbon-node w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-sm border-2 border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]">C</span>
+                        </div>
+
+                        <!-- Post-split Pyruvate chains (Initially hidden/constructed after animation) -->
+                        <div id="pyruvate-twins" class="hidden flex flex-col md:flex-row gap-8 items-center w-full justify-around">
+                            <div class="flex flex-col items-center gap-1.5 p-3 bg-slate-900 border border-emerald-500/30 rounded-xl">
+                                <span class="text-xs font-bold text-emerald-400">Pyruvate (A)</span>
+                                <div class="flex gap-1.5">
+                                    <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-950 text-sm">C</span>
+                                    <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-950 text-sm">C</span>
+                                    <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-950 text-sm">C</span>
+                                </div>
+                                <span class="text-[10px] text-slate-400">Yield: +1 NADH, +2 ATP</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1.5 p-3 bg-slate-900 border border-emerald-500/30 rounded-xl">
+                                <span class="text-xs font-bold text-emerald-400">Pyruvate (B)</span>
+                                <div class="flex gap-1.5">
+                                    <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-950 text-sm">C</span>
+                                    <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-950 text-sm">C</span>
+                                    <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-950 text-sm">C</span>
+                                </div>
+                                <span class="text-[10px] text-slate-400">Yield: +1 NADH, +2 ATP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="glycolysis-interactive-desc" class="bg-emerald-950/20 border border-emerald-800/30 p-3 rounded-lg text-xs text-center text-slate-300">
+                        In the <strong>Energy Investment Phase</strong>, 2 ATP molecules are burned to phosphorylate Glucose. Click the scissors to simulate the cleavage of fructose-1,6-bisphosphate into two G3P molecules, initiating the <strong>Energy Payoff Phase</strong>!
+                    </div>
+                </div>
+
+                <!-- STEP 2: Pyruvate Oxidation (Link Step) -->
+                <div id="scene-oxidation" class="hidden w-full h-full flex flex-col justify-between p-6 relative">
+                    <div class="text-center text-xs text-slate-400">Interactive: Strip carbon ($CO_2$) & attach Coenzyme A to create Acetyl-CoA.</div>
+                    
+                    <div class="flex flex-col items-center justify-center gap-6 my-auto">
+                        <div class="flex items-center gap-4">
+                            <!-- Pyruvate 3C -->
+                            <div class="flex items-center gap-1.5 p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-xl relative" id="pyruvate-3c">
+                                <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-100 text-sm">C</span>
+                                <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-100 text-sm">C</span>
+                                <span id="removable-carbon" class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center font-bold text-white text-sm border-2 border-red-300 shadow-[0_0_10px_rgba(239,68,68,0.5)] transition duration-500">C</span>
+                                <span class="text-xs text-emerald-400 font-bold ml-1">Pyruvate</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <!-- Intermediary Action Button -->
+                            <button id="decarb-btn" onclick="decarboxylatePyruvate()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg text-xs shadow-lg transition hover:scale-105 active:scale-95">
+                                <i class="fa-solid fa-burst"></i> Remove $CO_2$ & Oxidize
+                            </button>
+                            <button id="coa-btn" onclick="attachCoenzymeA()" class="hidden px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg text-xs shadow-lg transition hover:scale-105 active:scale-95">
+                                <i class="fa-solid fa-link"></i> Attach Coenzyme A (CoA-SH)
+                            </button>
+                        </div>
+
+                        <!-- Result Acetyl-CoA -->
+                        <div id="acetyl-coa-box" class="opacity-30 border border-slate-700 p-4 rounded-xl flex items-center gap-3 bg-slate-900 transition-all duration-500">
+                            <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-100 text-sm">C</span>
+                            <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-slate-100 text-sm">C</span>
+                            <span class="text-xs px-2.5 py-1 bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 font-mono rounded">CoA</span>
+                            <span class="text-xs font-bold text-cyan-400">Acetyl-CoA</span>
+                        </div>
+                    </div>
+
+                    <div id="oxidation-interactive-desc" class="bg-amber-950/20 border border-amber-800/30 p-3 rounded-lg text-xs text-center text-slate-300">
+                        Pyruvate enters the mitochondrial matrix via active transport. To begin oxidation, click <strong>"Remove $CO_2$"</strong> to strip a carboxyl group as waste and charge a $NAD^+$ carrier.
+                    </div>
+                </div>
+
+                <!-- STEP 3: Citric Acid Cycle Carousel -->
+                <div id="scene-krebs" class="hidden w-full h-full flex flex-col justify-between p-6 relative">
+                    <div class="text-center text-xs text-slate-400">Interactive: Spin the cycle or click intermediates to analyze outputs per turn.</div>
+                    
+                    <div class="relative w-72 h-72 mx-auto flex items-center justify-center my-auto">
+                        <!-- Circle pathway representation -->
+                        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 200 200">
+                            <!-- Circular track -->
+                            <circle cx="100" cy="100" r="75" fill="none" stroke="#334155" stroke-width="4" stroke-dasharray="10 5" />
+                            <!-- Arrow flow indicator -->
+                            <path d="M 175,100 A 75,75 0 0,1 100,175" fill="none" stroke="#10b981" stroke-width="4" marker-end="url(#arrow)" />
+                        </svg>
+
+                        <!-- Central Rotating Engine of Cycle -->
+                        <div id="krebs-rotor" class="absolute w-56 h-56 rounded-full border border-slate-800 bg-slate-900/80 flex items-center justify-center shadow-xl transition-all duration-1000">
+                            <div class="text-center p-4">
+                                <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold block mb-1">Rotatable Core</span>
+                                <h4 id="krebs-node-title" class="font-bold text-sm text-white">Oxaloacetate (4C)</h4>
+                                <p id="krebs-node-desc" class="text-[10px] text-slate-400 mt-1 max-w-[150px]">Combines with Acetyl-CoA (2C) to kick off the cycle.</p>
+                            </div>
+                        </div>
+
+                        <!-- Intermediates around the clock -->
+                        <button onclick="updateKrebsDetail(0, 'Oxaloacetate (4C)', 'Starting material of Kreb\'s cycle. Reconstructed at step end.', '#ef4444')" class="absolute top-1 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-rose-500/20 border-2 border-rose-500 text-xs font-bold text-rose-300 hover:scale-110 active:scale-95 transition flex items-center justify-center">OAA</button>
+                        <button onclick="updateKrebsDetail(1, 'Citrate (6C)', 'First 6-carbon molecule formed when Oxaloacetate bonds with the Acetyl group.', '#10b981')" class="absolute top-1/4 right-2 w-10 h-10 rounded-full bg-emerald-500/20 border-2 border-emerald-500 text-xs font-bold text-emerald-300 hover:scale-110 active:scale-95 transition flex items-center justify-center">Cit</button>
+                        <button onclick="updateKrebsDetail(2, 'Succinate (4C)', 'High energy molecule. Oxidation reduces FAD to FADH₂ and produces GTP/ATP.', '#f59e0b')" class="absolute bottom-1/4 right-2 w-10 h-10 rounded-full bg-amber-500/20 border-2 border-amber-500 text-xs font-bold text-amber-300 hover:scale-110 active:scale-95 transition flex items-center justify-center">Suc</button>
+                        <button onclick="updateKrebsDetail(3, 'Malate (4C)', 'Final intermediate. Oxidized to regenerate the starting Oxaloacetate.', '#3b82f6')" class="absolute bottom-1/4 left-2 w-10 h-10 rounded-full bg-blue-500/20 border-2 border-blue-500 text-xs font-bold text-blue-300 hover:scale-110 active:scale-95 transition flex items-center justify-center">Mal</button>
+                    </div>
+
+                    <div class="flex justify-center gap-4">
+                        <button onclick="spinKrebsCycle()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs shadow transition active:scale-95">
+                            <i class="fa-solid fa-arrows-spin"></i> Trigger Next Step Reaction
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Electron Transport Chain & ATP Synthase Dynamic Board -->
+                <div id="scene-etc" class="hidden w-full h-full flex flex-col justify-between p-4 relative overflow-hidden">
+                    <div class="text-center text-xs text-slate-400">Click complexes (I, III, IV) to pump protons. Spin ATP Synthase to generate ATP!</div>
+                    
+                    <!-- ETC Membrane Arena -->
+                    <div class="flex flex-col gap-6 my-auto relative w-full">
+                        <!-- Intermembrane space gradient -->
+                        <div class="h-10 bg-gradient-to-b from-amber-500/20 to-transparent border-t border-amber-500/30 rounded flex items-center justify-center text-[10px] text-amber-400 font-bold uppercase tracking-widest relative">
+                            Intermembrane Space (High H⁺ Concentration)
+                            <!-- Moving Protons -->
+                            <div class="absolute inset-x-0 h-full flex justify-around items-center" id="intermembrane-h-space">
+                                <span class="h-dot text-[10px] font-bold bg-amber-400 text-slate-950 px-1 rounded-full animate-bounce">H⁺</span>
+                                <span class="h-dot text-[10px] font-bold bg-amber-400 text-slate-950 px-1 rounded-full animate-bounce" style="animation-delay:0.3s">H⁺</span>
+                                <span class="h-dot text-[10px] font-bold bg-amber-400 text-slate-950 px-1 rounded-full animate-bounce" style="animation-delay:0.6s">H⁺</span>
+                            </div>
+                        </div>
+
+                        <!-- Inner Membrane Complexes representation -->
+                        <div class="grid grid-cols-5 gap-2 text-center relative">
+                            <!-- Matrix Space border label underneath -->
+                            <div class="col-span-1 border border-blue-500/30 rounded p-2 bg-slate-900 cursor-pointer hover:border-emerald-500" onclick="pumpProton('c1')">
+                                <span class="block text-xs font-bold text-blue-400">Complex I</span>
+                                <span class="text-[9px] text-slate-500">NADH input</span>
+                                <div class="mt-1 h-3 w-3 bg-cyan-400 rounded-full mx-auto" id="etc-c1"></div>
+                            </div>
+                            <div class="col-span-1 border border-blue-500/30 rounded p-2 bg-slate-900 cursor-pointer hover:border-emerald-500" onclick="pumpProton('c2')">
+                                <span class="block text-xs font-bold text-blue-400">Complex II</span>
+                                <span class="text-[9px] text-slate-500">FADH₂ input</span>
+                                <div class="mt-1 h-3 w-3 bg-cyan-400 rounded-full mx-auto" id="etc-c2"></div>
+                            </div>
+                            <div class="col-span-1 border border-blue-500/30 rounded p-2 bg-slate-900 cursor-pointer hover:border-emerald-500" onclick="pumpProton('c3')">
+                                <span class="block text-xs font-bold text-blue-400">Complex III</span>
+                                <span class="text-[9px] text-slate-500">Proton Pump</span>
+                                <div class="mt-1 h-3 w-3 bg-cyan-400 rounded-full mx-auto" id="etc-c3"></div>
+                            </div>
+                            <div class="col-span-1 border border-blue-500/30 rounded p-2 bg-slate-900 cursor-pointer hover:border-emerald-500" onclick="pumpProton('c4')">
+                                <span class="block text-xs font-bold text-blue-400">Complex IV</span>
+                                <span class="text-[9px] text-slate-500">Oxygen reduction</span>
+                                <div class="mt-1 h-3 w-3 bg-cyan-400 rounded-full mx-auto" id="etc-c4"></div>
+                            </div>
+                            <!-- ATP Synthase Engine -->
+                            <div class="col-span-1 border-2 border-emerald-500/50 bg-emerald-950/20 rounded p-2 relative cursor-pointer" onclick="manuallyGenerateATP()">
+                                <span class="block text-[10px] font-bold text-emerald-400 uppercase">ATP Synthase</span>
+                                <div class="w-8 h-8 rounded-full border border-dashed border-emerald-400 mx-auto animate-spin-slow flex items-center justify-center mt-1">
+                                    <i class="fa-solid fa-gears text-emerald-400 text-xs"></i>
+                                </div>
+                                <span class="text-[8px] text-emerald-300 font-bold block mt-1 animate-pulse">SPIN!</span>
+                            </div>
+                        </div>
+
+                        <div class="h-10 border-b border-blue-500/30 rounded flex items-center justify-center text-[10px] text-blue-400 font-bold uppercase tracking-widest">
+                            Mitochondrial Matrix (Low H⁺ Concentration)
+                        </div>
+                    </div>
+
+                    <!-- Mini Game controls inside step 4 -->
+                    <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-lg flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] font-bold text-amber-400 block"><i class="fa-solid fa-gamepad animate-pulse"></i> Interactive Proton-Motive Force Engine</span>
+                            <p class="text-[10px] text-slate-400">Pump 5 protons to power the ATP Synthase rotor, then spin it to generate ATP!</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] text-slate-400">Pumped H⁺:</span>
+                            <div class="text-xs font-bold text-emerald-400" id="etc-pumped-count">0 / 5</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REVIEW SECTION: Interactive Pathway Game -->
+                <div id="scene-review" class="hidden w-full h-full flex flex-col justify-between p-6 relative">
+                    <div class="text-center text-xs text-slate-400">Interactive Game: Match the metabolite inputs/outputs with their phase!</div>
+                    
+                    <div id="pathway-builder-container" class="grid grid-cols-2 gap-4 my-auto">
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+                            <span class="text-xs font-bold text-emerald-400 block mb-2 border-b border-slate-800 pb-1">Phase Inputs</span>
+                            <div class="flex flex-wrap gap-1.5" id="game-inputs-pool">
+                                <!-- Generated Dynamically -->
+                            </div>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
+                            <span class="text-xs font-bold text-amber-400 block mb-2 border-b border-slate-800 pb-1">Phase Names</span>
+                            <div class="flex flex-col gap-2" id="game-slots">
+                                <!-- Drop Targets -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-2.5 rounded-lg text-xs">
+                        <span id="game-feedback" class="text-slate-400">Drag or click matching compounds above.</span>
+                        <button onclick="resetPathwayGame()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded font-bold">Restart Puzzle</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Global Real-Time Metabolic Ledger Dashboard -->
+            <div class="mt-6 bg-slate-950/80 border border-slate-800 rounded-xl p-4 grid grid-cols-2 sm:grid-cols-4 gap-4 glow-green">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                        <i class="fa-solid fa-battery-three-quarters text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase text-slate-500 font-bold block">Net ATP Yield</span>
+                        <span class="text-lg font-bold text-emerald-400 font-mono" id="ledger-atp">0</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
+                        <i class="fa-solid fa-truck-ramp-box text-cyan-400"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase text-slate-500 font-bold block">NADH Charged</span>
+                        <span class="text-lg font-bold text-cyan-400 font-mono" id="ledger-nadh">0</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+                        <i class="fa-solid fa-truck-plane text-amber-400"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase text-slate-500 font-bold block">FADH₂ Charged</span>
+                        <span class="text-lg font-bold text-amber-400 font-mono" id="ledger-fadh2">0</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center">
+                        <i class="fa-solid fa-cloud-sun text-rose-400"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase text-slate-500 font-bold block">CO₂ Released</span>
+                        <span class="text-lg font-bold text-rose-400 font-mono" id="ledger-co2">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Interactive Guides & Academic Materials (Scrollable) -->
+        <section class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
+            
+            <!-- Navigation Tabs -->
+            <nav class="grid grid-cols-5 gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+                <button id="nav-btn-0" onclick="setStep(0)" class="tab-btn py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all bg-slate-800/80 text-white border border-slate-700/50">Intro</button>
+                <button id="nav-btn-1" onclick="setStep(1)" class="tab-btn py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Stg 1</button>
+                <button id="nav-btn-2" onclick="setStep(2)" class="tab-btn py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Stg 2</button>
+                <button id="nav-btn-3" onclick="setStep(3)" class="tab-btn py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Stg 3</button>
+                <button id="nav-btn-4" onclick="setStep(4)" class="tab-btn py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Stg 4</button>
+            </nav>
+
+            <!-- Guide Card (Dynamic Content Panel) -->
+            <article class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xl" id="guide-card">
+                
+                <!-- Dynamic Header and Subtitle -->
+                <div class="mb-4">
+                    <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold" id="guide-stage-label">Introduction</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-white mt-1" id="guide-stage-title">Powering Cellular Work</h3>
+                    <div class="h-0.5 bg-slate-800 mt-2.5"></div>
+                </div>
+
+                <!-- OpenStax Context and Text Container -->
+                <div class="text-sm text-slate-300 leading-relaxed space-y-4" id="guide-content-box">
+                    <p>Cellular respiration is a critical collection of metabolic reactions that convert biochemical energy from nutrients into adenosine triphosphate (ATP), releasing waste products in the process.</p>
+                    <p class="border-l-2 border-emerald-500/40 pl-3 italic text-xs text-slate-400 bg-emerald-500/5 py-2 pr-2 rounded">
+                        <strong>OpenStax Biology 2e Core:</strong> "Organisms must extract energy from food molecules, storing it in high-energy phosphate bonds of ATP. The chemical equation is:"
+                    </p>
+                    <!-- LaTeX Formula -->
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-center font-mono text-emerald-300 text-xs sm:text-sm overflow-x-auto">
+                        $$C_6H_{12}O_6 + 6O_2 \rightarrow 6CO_2 + 6H_2O + \text{Energy (ATP)}$$
+                    </div>
+                    <p>Click through the tabs or use the mitochondrion map to explore each stage of metabolic transformation.</p>
+                </div>
+
+                <!-- Academic Interactive Checks (Inline Task) -->
+                <div class="mt-6 border-t border-slate-800 pt-5">
+                    <h4 class="text-xs font-bold uppercase text-amber-400 tracking-wider mb-3"><i class="fa-solid fa-circle-check"></i> Concept Challenge Checkpoint</h4>
+                    <div id="checkpoint-activity-box" class="bg-slate-950/80 border border-slate-800 rounded-xl p-4">
+                        <p id="checkpoint-prompt" class="text-xs text-slate-300 font-semibold mb-3">Which compartment of the cell hosts anaerobic glycolysis?</p>
+                        <div class="flex flex-col gap-2" id="checkpoint-options">
+                            <!-- Populated with check options based on active step -->
+                            <button onclick="checkAnswer(true, 'Correct! Glycolysis occurs directly in the fluid environment of the cytoplasm.')" class="w-full text-left text-xs p-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg hover:border-slate-700 transition">Cytoplasm (cytosol)</button>
+                            <button onclick="checkAnswer(false, 'Incorrect. The mitochondrial matrix hosts Kreb\'s cycle and pyruvate oxidation.')" class="w-full text-left text-xs p-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg hover:border-slate-700 transition">Mitochondrial Matrix</button>
+                        </div>
+                        <div id="checkpoint-feedback" class="mt-3 text-xs hidden"></div>
+                    </div>
+                </div>
+
+            </article>
+
+            <!-- Quick Assessment / Stage Navigation Button Area -->
+            <div class="flex items-center justify-between gap-4">
+                <button id="prev-step-btn" disabled onclick="navigateStep(-1)" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold text-slate-300 border border-slate-800 rounded-xl transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Step
+                </button>
+                <button id="next-step-btn" onclick="navigateStep(1)" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white rounded-xl transition flex items-center gap-1.5">
+                    Next Step <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Quick Assessment / Game Trigger Block -->
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-amber-500/10 rounded-xl border border-amber-500/20">
+                        <i class="fa-solid fa-trophy text-amber-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-white">Review Challenge</h4>
+                        <span class="text-[10px] text-slate-400">Validate metabolic accounting</span>
+                    </div>
+                </div>
+                <button onclick="triggerReviewPhase()" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-semibold transition active:scale-95">
+                    <i class="fa-solid fa-gamepad"></i> Play Game
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer Copyright -->
+    <footer class="mt-auto border-t border-slate-800 bg-slate-950 py-4 text-center text-xs text-slate-500 px-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p>© 2026 Respiration Explorer. Designed in compatibility with OpenStax Biology 2e (Creative Commons license).</p>
+            <div class="flex gap-4">
+                <a href="https://openstax.org/books/biology-2e/pages/7-introduction" target="_blank" class="hover:text-slate-300 transition underline">Reference Text</a>
+                <span>|</span>
+                <span class="text-emerald-400 font-mono">Academic Simulation</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript State & Interactive Animations Logic -->
+    <script>
+        // Active Application State Model
+        const state = {
+            currentStep: 0,
+            hasSplitGlucose: false,
+            hasDecarboxylated: false,
+            hasAttachedCoA: false,
+            pumpedProtonsCount: 0,
+            generatedATP: 0,
+            krebsStepIndex: 0,
+            voiceEnabled: true,
+            ledger: {
+                atp: 0,
+                nadh: 0,
+                fadh2: 0,
+                co2: 0
+            }
+        };
+
+        // OpenStax Stage Content Blocks
+        const stepMaterials = {
+            0: {
+                label: "Introduction",
+                title: "A Cellular Overview",
+                desc: `
+                    <p>Organisms generate energy by breaking down sugars. The full breakdown of glucose is standardly classified as an <strong>aerobic process</strong>, although its initial step can happen without oxygen.</p>
+                    <p class="border-l-2 border-emerald-500/40 pl-3 italic text-xs text-slate-400 bg-emerald-500/5 py-2 rounded">
+                        <strong>OpenStax Biology 2e:</strong> "Cellular respiration occurs in both eukaryotic and prokaryotic cells. In eukaryotes, the majority of the chemical processes take place in specialized organelles called mitochondria."
+                    </p>
+                    <p>To begin, hover or click different compartments on the <strong>Mitochondrion Map</strong> above to understand the anatomy of power generation.</p>
+                `,
+                checkpointPrompt: "Which membrane in the mitochondrion contains highly folded cristae?",
+                options: [
+                    { text: "Inner Membrane", correct: true, feedback: "Correct! The foldings (cristae) massively increase surface area for electron transport chains." },
+                    { text: "Outer Membrane", correct: false, feedback: "Incorrect. The outer membrane is smooth and acts as a boundary element." }
+                ],
+                canvasTitle: "Cellular Location & Structure Map"
+            },
+            1: {
+                label: "Stage 1",
+                title: "Glycolysis: Splitting the Core",
+                desc: `
+                    <p><strong>Glycolysis</strong> is the first pathway of cellular respiration, occurring entirely in the <strong>cytoplasm</strong>. It starts with a single 6-carbon Glucose molecule and yields two 3-carbon Pyruvate molecules.</p>
+                    <p class="border-l-2 border-emerald-500/40 pl-3 italic text-xs text-slate-400 bg-emerald-500/5 py-2 rounded">
+                        <strong>OpenStax 2e Note:</strong> Glycolysis consists of two halves:
+                        1. <em>Energy Investment Phase:</em> Uses 2 ATP molecules to phosphorylate glucose, preparing it for cleavage.
+                        2. <em>Energy Payoff Phase:</em> Extracts energy by reducing NAD⁺ to NADH and synthesizing 4 ATP.
+                    </p>
+                    <p class="font-bold text-emerald-400 text-xs">Interactive Task: Click the SCISSORS icon on the left to cleave glucose and synthesize high-energy carriers!</p>
+                `,
+                checkpointPrompt: "What is the NET production of ATP from a single glucose molecule in Glycolysis?",
+                options: [
+                    { text: "2 ATP molecules", correct: true, feedback: "Correct! 4 ATP are made, but 2 are spent, yielding a net of 2." },
+                    { text: "4 ATP molecules", correct: false, feedback: "Incorrect. While 4 ATP are generated, we must subtract the 2 ATP used initially." }
+                ],
+                canvasTitle: "Stage 1: Glycolysis Splitting Simulator"
+            },
+            2: {
+                label: "Stage 2",
+                title: "Pyruvate Oxidation: The Link Step",
+                desc: `
+                    <p>To enter the Citric Acid Cycle, <strong>Pyruvate (3C)</strong> must be modified. Pyruvate is actively transported across the mitochondrial membranes into the <strong>matrix</strong>.</p>
+                    <p class="border-l-2 border-emerald-500/40 pl-3 italic text-xs text-slate-400 bg-emerald-500/5 py-2 rounded">
+                        <strong>OpenStax:</strong> This step is mediated by a multi-enzyme complex called pyruvate dehydrogenase:
+                        <ul class="list-disc list-inside space-y-1 text-xs mt-1 text-slate-300">
+                            <li>Carboxyl group is removed, releasing CO₂.</li>
+                            <li>NAD⁺ is reduced to NADH.</li>
+                            <li>The remaining acetyl group is bonded to Coenzyme A, forming Acetyl-CoA.</li>
+                        </ul>
+                    </p>
+                    <p class="font-bold text-amber-400 text-xs">Interactive Task: Click 'Remove CO₂' then 'Attach Coenzyme A' on the left panel to complete oxidation.</p>
+                `,
+                checkpointPrompt: "How many carbon atoms are in the acetyl group of Acetyl-CoA?",
+                options: [
+                    { text: "2 carbons", correct: true, feedback: "Correct! The 3-carbon pyruvate lost 1 carbon as carbon dioxide (CO₂)." },
+                    { text: "3 carbons", correct: false, feedback: "Incorrect. Pyruvate had 3, but lost one during oxidation." }
+                ],
+                canvasTitle: "Stage 2: Pyruvate Decarboxylation Link"
+            },
+            3: {
+                label: "Stage 3",
+                title: "Citric Acid (Krebs) Cycle",
+                desc: `
+                    <p>The <strong>Citric Acid Cycle</strong> is an 8-step chemical loop in the mitochondrial <strong>matrix</strong>. Each acetyl group from Acetyl-CoA is transferred to oxaloacetate (4C) to create citrate (6C), which is progressively oxidized.</p>
+                    <p class="border-l-2 border-emerald-500/40 pl-3 italic text-xs text-slate-400 bg-emerald-500/5 py-2 rounded">
+                        <strong>OpenStax 2e Yield:</strong> For every glucose molecule (2 Acetyl-CoA turns), the cycle yields: 
+                        4 CO₂, 6 NADH, 2 FADH₂, and 2 ATP (or GTP).
+                    </p>
+                    <p class="font-bold text-emerald-400 text-xs">Interactive Task: Click on the circular intermediate buttons or use the spin reaction trigger to cycle through key chemicals.</p>
+                `,
+                checkpointPrompt: "Which starting molecule is regenerated at the end of the Kreb's Cycle loop?",
+                options: [
+                    { text: "Oxaloacetate (4C)", correct: true, feedback: "Correct! The cycle ends by reforming oxaloacetate to bind with the next Acetyl-CoA." },
+                    { text: "Citrate (6C)", correct: false, feedback: "Incorrect. Citrate is the initial compound formed, not the regenerated acceptor." }
+                ],
+                canvasTitle: "Stage 3: Citric Acid Cycle Intermediates"
+            },
+            4: {
+                label: "Stage 4",
+                title: "Oxidative Phosphorylation",
+                desc: `
+                    <p>The final stage occurs on the <strong>inner membrane (cristae)</strong>. It consists of the <strong>Electron Transport Chain (ETC)</strong> and <strong>Chemiosmosis</strong>.</p>
+                    <p class="border-l-2 border-emerald-500/40 pl-3 italic text-xs text-slate-400 bg-emerald-500/5 py-2 rounded">
+                        <strong>OpenStax Details:</strong> Electrons from NADH and FADH₂ are passed down proteins. This energy is used to pump H⁺ into the intermembrane space, creating a proton-motive force. Oxygen serves as the <strong>final electron acceptor</strong> and is reduced to water (H₂O).
+                    </p>
+                    <p class="font-bold text-cyan-400 text-xs">Interactive Task: Click Complexes I-IV to pump 5 protons, then rapidly click/spin the ATP Synthase rotor to generate massive ATP!</p>
+                `,
+                checkpointPrompt: "What chemical element is the final electron acceptor in the Electron Transport Chain?",
+                options: [
+                    { text: "Oxygen (O₂)", correct: true, feedback: "Correct! Oxygen accepts the spent electrons and binds with protons to yield water." },
+                    { text: "Carbon Dioxide (CO₂)", correct: false, feedback: "Incorrect. CO₂ is a waste carbon byproduct of stages 2 and 3." }
+                ],
+                canvasTitle: "Stage 4: ETC & ATP Synthase Generator"
+            }
+        };
+
+        // Initialize App & Event Listeners
+        window.addEventListener('DOMContentLoaded', () => {
+            // Render Math Equations safely on loaded DOM
+            if (typeof renderMathInElement === 'function') {
+                try {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ]
+                    });
+                } catch (err) {
+                    console.error("KaTeX rendering encountered an issue: ", err);
+                }
+            }
+            setStep(0);
+            updateLedgerDisplay();
+        });
+
+        // Step Controller
+        function setStep(stepIndex) {
+            state.currentStep = stepIndex;
+            
+            // Highlight navigation tabs
+            document.querySelectorAll('.tab-btn').forEach((btn, index) => {
+                if(index === stepIndex) {
+                    btn.className = "tab-btn py-2 text-xs font-semibold rounded-lg text-emerald-400 bg-slate-800 border-b-2 border-emerald-500 transition-all";
+                } else {
+                    btn.className = "tab-btn py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
+                }
+            });
+
+            // Update Header Progress Bar
+            const progressPct = ((stepIndex + 1) / 5) * 100;
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            if (progressBar) progressBar.style.width = `${progressPct}%`;
+            if (progressText) progressText.innerText = `${stepMaterials[stepIndex].label}: ${stepMaterials[stepIndex].title}`;
+
+            // Sync visual panels
+            const interactiveTitle = document.getElementById('interactive-canvas-title');
+            if (interactiveTitle) interactiveTitle.innerText = stepMaterials[stepIndex].canvasTitle;
+
+            toggleScenes(stepIndex);
+            populateGuideMaterial(stepIndex);
+            
+            // Adjust Step Navigation buttons
+            const prevBtn = document.getElementById('prev-step-btn');
+            const nextBtn = document.getElementById('next-step-btn');
+            if (prevBtn) prevBtn.disabled = stepIndex === 0;
+            if (nextBtn) {
+                if (stepIndex === 4) {
+                    nextBtn.innerHTML = `Interactive Summary <i class="fa-solid fa-graduation-cap"></i>`;
+                    nextBtn.onclick = () => triggerReviewPhase();
+                } else {
+                    nextBtn.innerHTML = `Next Step <i class="fa-solid fa-arrow-right"></i>`;
+                    nextBtn.onclick = () => navigateStep(1);
+                }
+            }
+
+            // Sync structural changes with ledger simulation
+            recalculateLedgerState(stepIndex);
+        }
+
+        // Toggle SVG Visual Scene Screens
+        function toggleScenes(stepIndex) {
+            const scenes = ['scene-intro', 'scene-glycolysis', 'scene-oxidation', 'scene-krebs', 'scene-etc', 'scene-review'];
+            scenes.forEach((sceneId, index) => {
+                const element = document.getElementById(sceneId);
+                if (element) {
+                    if (index === stepIndex) {
+                        element.classList.remove('hidden');
+                    } else {
+                        element.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        // Handle navigation clicks
+        function navigateStep(direction) {
+            let next = state.currentStep + direction;
+            if (next >= 0 && next <= 4) {
+                setStep(next);
+            }
+        }
+
+        // Populating dynamic right-column materials
+        function populateGuideMaterial(stepIndex) {
+            const data = stepMaterials[stepIndex];
+            const guideStageLabel = document.getElementById('guide-stage-label');
+            const guideStageTitle = document.getElementById('guide-stage-title');
+            const guideContentBox = document.getElementById('guide-content-box');
+            
+            if (guideStageLabel) guideStageLabel.innerText = data.label;
+            if (guideStageTitle) guideStageTitle.innerText = data.title;
+            if (guideContentBox) guideContentBox.innerHTML = data.desc;
+            
+            // Checkpoint setup
+            const checkpointPrompt = document.getElementById('checkpoint-prompt');
+            if (checkpointPrompt) checkpointPrompt.innerText = data.checkpointPrompt;
+            
+            const optionsBox = document.getElementById('checkpoint-options');
+            if (optionsBox) {
+                optionsBox.innerHTML = '';
+                data.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left text-xs p-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg hover:border-slate-700 transition";
+                    btn.innerText = opt.text;
+                    btn.onclick = () => checkAnswer(opt.correct, opt.feedback);
+                    optionsBox.appendChild(btn);
+                });
+            }
+            
+            const checkpointFeedback = document.getElementById('checkpoint-feedback');
+            if (checkpointFeedback) checkpointFeedback.classList.add('hidden');
+        }
+
+        // Quick Feedback Engine for Quizzes
+        function checkAnswer(isCorrect, feedbackText) {
+            const fb = document.getElementById('checkpoint-feedback');
+            if (!fb) return;
+            fb.classList.remove('hidden');
+            if (isCorrect) {
+                fb.className = "mt-3 text-xs p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg";
+                fb.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${feedbackText}`;
+            } else {
+                fb.className = "mt-3 text-xs p-2.5 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg";
+                fb.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${feedbackText}`;
+            }
+        }
+
+        // Interactive Mitochondria Hover/Click region logic
+        function showMitoRegion(region) {
+            const infoBox = document.getElementById('mitochondria-details-box');
+            if (!infoBox) return;
+            let info = "";
+            switch (region) {
+                case 'cytoplasm':
+                    info = "<strong>Cytoplasm (Cytosol)</strong>: The fluid environment of the cell. Anaerobic Glycolysis occurs here, breaking down Glucose into two Pyruvates.";
+                    break;
+                case 'outer':
+                    info = "<strong>Outer Membrane</strong>: Smooth lipid bilayer containing large channel proteins (porins) allowing small molecules to cross safely.";
+                    break;
+                case 'inner':
+                    info = "<strong>Inner Membrane (Cristae)</strong>: Heavily folded to increase surface area. Houses Electron Transport complexes and ATP Synthase machinery.";
+                    break;
+                case 'intermembrane':
+                    info = "<strong>Intermembrane Space</strong>: Region between outer & inner membranes. Receives pumped $H^+$ ions in Stage 4, building the proton-motive force.";
+                    break;
+                case 'matrix':
+                    info = "<strong>Mitochondrial Matrix</strong>: Fluid gel inner core. Houses Pyruvate Oxidation enzymes, Acetyl-CoA link transformations, and the full Citric Acid Cycle.";
+                    break;
+            }
+            infoBox.innerHTML = `<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-info"></i> ${info}</span>`;
+        }
+
+        // Ledger Metabolic Calculator based on Active Progression state
+        function recalculateLedgerState(stepIndex) {
+            // Re-evaluating metabolic cumulative accountants
+            state.ledger.atp = 0;
+            state.ledger.nadh = 0;
+            state.ledger.fadh2 = 0;
+            state.ledger.co2 = 0;
+
+            if (stepIndex >= 1 && state.hasSplitGlucose) {
+                state.ledger.atp += 2;
+                state.ledger.nadh += 2;
+            }
+            if (stepIndex >= 2 && state.hasDecarboxylated) {
+                state.ledger.co2 += 2;
+                state.ledger.nadh += 2;
+            }
+            if (stepIndex >= 3) {
+                state.ledger.atp += 2;
+                state.ledger.nadh += 6;
+                state.ledger.fadh2 += 2;
+                state.ledger.co2 += 4;
+            }
+            if (stepIndex >= 4) {
+                state.ledger.atp += state.generatedATP;
+            }
+            updateLedgerDisplay();
+        }
+
+        function updateLedgerDisplay() {
+            const ledgerAtp = document.getElementById('ledger-atp');
+            const ledgerNadh = document.getElementById('ledger-nadh');
+            const ledgerFadh2 = document.getElementById('ledger-fadh2');
+            const ledgerCo2 = document.getElementById('ledger-co2');
+
+            if (ledgerAtp) ledgerAtp.innerText = state.ledger.atp;
+            if (ledgerNadh) ledgerNadh.innerText = state.ledger.nadh;
+            if (ledgerFadh2) ledgerFadh2.innerText = state.ledger.fadh2;
+            if (ledgerCo2) ledgerCo2.innerText = state.ledger.co2;
+        }
+
+        // Step 1: Split Glucose Action Simulator
+        function splitGlucoseAction() {
+            state.hasSplitGlucose = true;
+            const glucoseChain = document.getElementById('glucose-chain');
+            const pyruvateTwins = document.getElementById('pyruvate-twins');
+            const glycolysisDesc = document.getElementById('glycolysis-interactive-desc');
+            
+            if (glucoseChain) glucoseChain.classList.add('hidden');
+            if (pyruvateTwins) pyruvateTwins.classList.remove('hidden');
+            if (glycolysisDesc) {
+                glycolysisDesc.innerHTML = `
+                    <span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check"></i> Fructose cleaved!</span> Fructose-1,6-bisphosphate split into two isomers (DHAP & G3P). The oxidation yield generates <strong>4 ATP (net 2 ATP)</strong> and <strong>2 NADH</strong>.
+                `;
+            }
+            recalculateLedgerState(1);
+        }
+
+        // Step 2: Decarboxylate Action Simulator
+        function decarboxylatePyruvate() {
+            state.hasDecarboxylated = true;
+            const item = document.getElementById('removable-carbon');
+            if (item) {
+                item.style.transform = 'translateY(-100px) scale(0)';
+                item.style.opacity = '0';
+            }
+            
+            const decarbBtn = document.getElementById('decarb-btn');
+            const coaBtn = document.getElementById('coa-btn');
+            const oxidationDesc = document.getElementById('oxidation-interactive-desc');
+
+            if (decarbBtn) decarbBtn.classList.add('hidden');
+            if (coaBtn) coaBtn.classList.remove('hidden');
+            if (oxidationDesc) {
+                oxidationDesc.innerHTML = `
+                    <span class="text-amber-400 font-bold"><i class="fa-solid fa-circle-check"></i> CO₂ Dispatched!</span> Carbon removed & NADH generated. Now click <strong>"Attach Coenzyme A"</strong> to form the active metabolic carrier.
+                `;
+            }
+            recalculateLedgerState(2);
+        }
+
+        function attachCoenzymeA() {
+            state.hasAttachedCoA = true;
+            const coaBtn = document.getElementById('coa-btn');
+            const acetylCoA = document.getElementById('acetyl-coa-box');
+            const oxidationDesc = document.getElementById('oxidation-interactive-desc');
+
+            if (coaBtn) coaBtn.classList.add('hidden');
+            if (acetylCoA) {
+                acetylCoA.className = "border border-cyan-400 p-4 rounded-xl flex items-center gap-3 bg-cyan-950/20 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all duration-500 scale-105";
+            }
+            if (oxidationDesc) {
+                oxidationDesc.innerHTML = `
+                    <span class="text-cyan-400 font-bold"><i class="fa-solid fa-circle-check"></i> Acetyl-CoA Formed!</span> High-energy Coenzyme A linkage is complete. The acetyl group is now fully ready to jump into the Citric Acid Cycle.
+                `;
+            }
+        }
+
+        // Step 3: Citric Acid Cycle Spinner
+        function spinKrebsCycle() {
+            state.krebsStepIndex = (state.krebsStepIndex + 1) % 4;
+            const r = document.getElementById('krebs-rotor');
+            const angle = state.krebsStepIndex * 90;
+            if (r) r.style.transform = `rotate(${angle}deg)`;
+            
+            // Auto update detail descriptions based on cycle segment
+            const details = [
+                { title: 'Oxaloacetate (4C)', desc: 'Combines with Acetyl-CoA (2C) to kick off the cycle.', color: '#ef4444' },
+                { title: 'Citrate (6C)', desc: 'First 6-carbon molecule formed when Oxaloacetate bonds with the Acetyl group.', color: '#10b981' },
+                { title: 'Succinate (4C)', desc: 'High energy molecule. Oxidation reduces FAD to FADH₂ and produces GTP/ATP.', color: '#f59e0b' },
+                { title: 'Malate (4C)', desc: 'Final intermediate. Oxidized to regenerate the starting Oxaloacetate.', color: '#3b82f6' }
+            ];
+            const active = details[state.krebsStepIndex];
+            updateKrebsDetail(state.krebsStepIndex, active.title, active.desc, active.color);
+        }
+
+        function updateKrebsDetail(index, title, desc, color) {
+            const krebsNodeTitle = document.getElementById('krebs-node-title');
+            const krebsNodeDesc = document.getElementById('krebs-node-desc');
+            if (krebsNodeTitle) {
+                krebsNodeTitle.innerText = title;
+                krebsNodeTitle.style.color = color;
+            }
+            if (krebsNodeDesc) krebsNodeDesc.innerText = desc;
+        }
+
+        // Step 4: Proton Pumping & ATP Synthase Generator Action
+        function pumpProton(complexId) {
+            state.pumpedProtonsCount++;
+            if (state.pumpedProtonsCount > 5) state.pumpedProtonsCount = 5;
+            
+            const pumpedCount = document.getElementById('etc-pumped-count');
+            if (pumpedCount) pumpedCount.innerText = `${state.pumpedProtonsCount} / 5`;
+            
+            // Animate complex flash
+            const el = document.getElementById(`etc-${complexId}`);
+            if (el) {
+                el.className = "mt-1 h-3.5 w-3.5 bg-amber-400 rounded-full mx-auto animate-ping";
+                setTimeout(() => {
+                    if (el) el.className = "mt-1 h-3 w-3 bg-cyan-400 rounded-full mx-auto";
+                }, 600);
+            }
+        }
+
+        function manuallyGenerateATP() {
+            if (state.pumpedProtonsCount >= 5) {
+                state.generatedATP += 10;
+                state.pumpedProtonsCount = 0;
+                const pumpedCount = document.getElementById('etc-pumped-count');
+                if (pumpedCount) pumpedCount.innerText = `0 / 5`;
+                recalculateLedgerState(4);
+                
+                // Show floating text effect
+                const container = document.getElementById('canvas-container');
+                if (container) {
+                    const p = document.createElement('span');
+                    p.className = "absolute text-emerald-400 font-extrabold text-lg animate-bounce pointer-events-none";
+                    p.style.top = "50%";
+                    p.style.right = "10%";
+                    p.innerText = "+10 ATP!";
+                    container.appendChild(p);
+                    setTimeout(() => p.remove(), 1200);
+                }
+            } else {
+                // Flash alert to pump first
+                const el = document.getElementById('etc-pumped-count');
+                if (el) {
+                    el.className = "text-xs font-bold text-red-500 animate-bounce";
+                    setTimeout(() => {
+                        if (el) el.className = "text-xs font-bold text-emerald-400";
+                    }, 1000);
+                }
+            }
+        }
+
+        // Reset Visualizer Components state
+        function resetCurrentVisuals() {
+            state.hasSplitGlucose = false;
+            state.hasDecarboxylated = false;
+            state.hasAttachedCoA = false;
+            state.pumpedProtonsCount = 0;
+            state.generatedATP = 0;
+            
+            // Reset DOM UI states
+            const glucoseChain = document.getElementById('glucose-chain');
+            const pyruvateTwins = document.getElementById('pyruvate-twins');
+            const removableCarbon = document.getElementById('removable-carbon');
+            const decarbBtn = document.getElementById('decarb-btn');
+            const coaBtn = document.getElementById('coa-btn');
+            const acetylBox = document.getElementById('acetyl-coa-box');
+            const glycolysisDesc = document.getElementById('glycolysis-interactive-desc');
+
+            if (glucoseChain) glucoseChain.classList.remove('hidden');
+            if (pyruvateTwins) pyruvateTwins.classList.add('hidden');
+            if (removableCarbon) {
+                removableCarbon.style.opacity = '1';
+                removableCarbon.style.transform = 'none';
+            }
+            if (decarbBtn) decarbBtn.classList.remove('hidden');
+            if (coaBtn) coaBtn.classList.add('hidden');
+            if (acetylBox) {
+                acetylBox.className = "opacity-30 border border-slate-700 p-4 rounded-xl flex items-center gap-3 bg-slate-900";
+            }
+            if (glycolysisDesc) {
+                glycolysisDesc.innerHTML = `In the <strong>Energy Investment Phase</strong>, 2 ATP molecules are burned to phosphorylate Glucose. Click the scissors to simulate the cleavage of fructose-1,6-bisphosphate into two G3P molecules, initiating the <strong>Energy Payoff Phase</strong>!`;
+            }
+            
+            recalculateLedgerState(state.currentStep);
+        }
+
+        // Dynamic Interactive Review Game
+        const matchData = [
+            { name: "Glucose Molecule", slot: "Glycolysis" },
+            { name: "Oxygen (O₂)", slot: "ETC / Oxidative Phosphorylation" },
+            { name: "Citrate Formed", slot: "Citric Acid Cycle" },
+            { name: "Acetyl-CoA Link", slot: "Pyruvate Oxidation" }
+        ];
+
+        function triggerReviewPhase() {
+            toggleScenes(5);
+            const interactiveTitle = document.getElementById('interactive-canvas-title');
+            const canvasStatusDot = document.getElementById('canvas-status-dot');
+
+            if (interactiveTitle) interactiveTitle.innerText = "Respiration Pathway Builder";
+            if (canvasStatusDot) canvasStatusDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse";
+            
+            // Build Dynamic Elements
+            resetPathwayGame();
+        }
+
+        function resetPathwayGame() {
+            const pool = document.getElementById('game-inputs-pool');
+            const slots = document.getElementById('game-slots');
+            const gameFeedback = document.getElementById('game-feedback');
+
+            if (pool) pool.innerHTML = '';
+            if (slots) slots.innerHTML = '';
+            if (gameFeedback) gameFeedback.innerText = "Select a molecule on the left, then click its matching cellular stage on the right.";
+
+            // Shuffle array
+            const items = [...matchData].sort(() => Math.random() - 0.5);
+            const slotStages = ["Glycolysis", "Pyruvate Oxidation", "Citric Acid Cycle", "ETC / Oxidative Phosphorylation"];
+
+            items.forEach(item => {
+                const b = document.createElement('button');
+                b.className = "px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition-all active:scale-95";
+                b.innerText = item.name;
+                b.onclick = () => selectItem(b, item);
+                if (pool) pool.appendChild(b);
+            });
+
+            slotStages.forEach(stage => {
+                const d = document.createElement('button');
+                d.className = "w-full text-left text-xs p-3 bg-slate-950 border border-dashed border-slate-800 rounded-lg text-slate-400 flex justify-between items-center hover:border-slate-600 transition";
+                d.innerHTML = `<span>${stage}</span> <span class="text-[10px] text-slate-600">Empty Slot</span>`;
+                d.onclick = () => matchToSlot(stage, d);
+                if (slots) slots.appendChild(d);
+            });
+        }
+
+        let selected = null;
+        let selectedEl = null;
+
+        function selectItem(el, itemData) {
+            if (selectedEl) selectedEl.classList.remove('border-amber-400', 'bg-amber-950/20');
+            selected = itemData;
+            selectedEl = el;
+            el.classList.add('border-amber-400', 'bg-amber-950/20');
+        }
+
+        function matchToSlot(stageName, slotEl) {
+            const gameFeedback = document.getElementById('game-feedback');
+            if (!selected) {
+                if (gameFeedback) gameFeedback.innerText = "Please select a molecule node first!";
+                return;
+            }
+            if (selected.slot === stageName) {
+                slotEl.innerHTML = `<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check"></i> ${selected.name}</span> <span class="text-[10px] text-emerald-500 font-bold">MATCH</span>`;
+                slotEl.className = "w-full text-left text-xs p-3 bg-emerald-950/10 border border-emerald-500/30 rounded-lg text-slate-100 flex justify-between items-center";
+                if (selectedEl) selectedEl.remove();
+                selected = null;
+                selectedEl = null;
+                if (gameFeedback) gameFeedback.innerText = "Nice work! Correct matching alignment.";
+                
+                // Add points to ledger
+                state.ledger.atp += 5;
+                updateLedgerDisplay();
+            } else {
+                if (gameFeedback) gameFeedback.innerText = `Incorrect matching. ${selected.name} does not match ${stageName}.`;
+            }
+        }
+
+        // Native Browser TTS Voice Narration for accessibility
+        function readAloudText() {
+            const icon = document.getElementById('voice-icon');
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                if (icon) icon.className = "fa-solid fa-volume-high text-emerald-400";
+                return;
+            }
+            
+            const guideContent = document.getElementById('guide-content-box');
+            if (!guideContent) return;
+            const rawContent = guideContent.innerText;
+            const utterance = new SpeechSynthesisUtterance(rawContent);
+            utterance.rate = 1.05;
+            
+            utterance.onstart = () => {
+                if (icon) icon.className = "fa-solid fa-volume-xmark text-red-500 animate-pulse";
+            };
+            utterance.onend = () => {
+                if (icon) icon.className = "fa-solid fa-volume-high text-emerald-400";
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>
