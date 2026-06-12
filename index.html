@@ -1,56 +1,152 @@
-<body>
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Janani Gopalakrishnan | Professor, Tarrant County College</title>
+    <!-- Tailwind CSS for robust, modern utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font Family for premium typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Smooth transitions for active hover micro-interactions */
+        .interactive-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-full text-slate-800">
 
-    <header>
-        <h1>Janani Gopalakrishnan</h1>
-        <p>Professor &bull; Tarrant County College</p>
+    <!-- Academic Header Banner -->
+    <header class="bg-[#004b87] text-white py-16 px-4 shadow-md text-center relative overflow-hidden">
+        <!-- Abstract background pattern for a professional touch -->
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="max-w-4xl mx-auto relative z-10">
+            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">Janani Gopalakrishnan</h1>
+            <p class="mt-3 text-xl font-light text-blue-100">Professor of Biology</p>
+            <p class="mt-1 text-md font-medium tracking-wide text-blue-200 uppercase">Tarrant County College</p>
+        </div>
     </header>
 
-    <div class="container">
-        <div class="card">
-            <h2>Welcome</h2>
-            <p>Welcome to my academic homepage. As a professor at Tarrant County College, I am dedicated to fostering an engaging learning environment and supporting students in their educational journeys.</p>
-        </div>
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-10 space-y-8">
+        
+        <!-- Welcome Section -->
+        <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100">
+            <h2 class="text-2xl font-bold text-[#004b87] mb-4 border-b pb-3 border-slate-100 flex items-center gap-2">
+                <span class="text-2xl">👋</span> Welcome Students & Peers
+            </h2>
+            <p class="text-slate-600 leading-relaxed text-lg">
+                Welcome to my academic homepage. As a professor at Tarrant County College, my goal is to foster deep biological inquiries and cultivate supportive spaces for academic excellence. Use the interactive tools and lecture companions below to aid your studies throughout the semester.
+            </p>
+        </section>
 
-        <div class="card">
-            <h2>Course Resources</h2>
-            <p>Access lecture notes, study guides, and interactive resources for our current units below:</p>
-            <ul>
-                <li>
-                    <a class="resource-link" href="cellular_respiration.html">View Cellular Respiration Module</a>
-                </li>
-                <li>
-                    <a class="resource-link" href="lessonplan.html" style="background-color: #6c757d;">View Lesson Plan</a>
-                </li>
-            </ul>
-        </div>
+        <!-- Course Resources & Dynamic Navigation Grid -->
+        <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100">
+            <h2 class="text-2xl font-bold text-[#004b87] mb-4 border-b pb-3 border-slate-100 flex items-center gap-2">
+                <span class="text-2xl">📚</span> Course Resources & Active Learning
+            </h2>
+            <p class="text-slate-500 mb-6">Select a module or companion tool below to view planning, curriculum details, or visual interactive lessons:</p>
+            
+            <!-- Link Navigation Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- 1. Cellular Respiration Module -->
+                <a href="cellular_respiration.html" class="interactive-card flex flex-col justify-between p-6 rounded-xl border border-blue-100 bg-blue-50/30 hover:bg-blue-50 hover:border-blue-200 shadow-sm group">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 font-bold mb-3">🧪</div>
+                        <h3 class="font-bold text-lg text-blue-900 group-hover:text-[#004b87]">Cellular Respiration</h3>
+                        <p class="text-sm text-slate-600 mt-2">Interactive, visual study module detailing glycolysis, the citric acid cycle, and ATP synthesis.</p>
+                    </div>
+                    <span class="mt-5 inline-flex items-center text-sm font-semibold text-[#004b87] group-hover:underline">
+                        Explore Lesson &rarr;
+                    </span>
+                </a>
 
-        <div class="card">
-            <h2>Student Dashboard Corner</h2>
-            <p>Click below to see a daily motivational tip for your studies:</p>
-            <button id="tip-btn">Get Study Tip</button>
-            <div id="dynamic-message"></div>
-        </div>
-    </div>
+                <!-- 2. Course Lesson Plan -->
+                <a href="lessonplan.html" class="interactive-card flex flex-col justify-between p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100 hover:border-slate-300 shadow-sm group">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-slate-500/10 flex items-center justify-center text-slate-600 font-bold mb-3">🗓️</div>
+                        <h3 class="font-bold text-lg text-slate-800 group-hover:text-black">Lesson Schedule</h3>
+                        <p class="text-sm text-slate-600 mt-2">Comprehensive syllabus layout, learning goals, weekly readings, and exam preparations.</p>
+                    </div>
+                    <span class="mt-5 inline-flex items-center text-sm font-semibold text-slate-700 group-hover:underline">
+                        View Schedule &rarr;
+                    </span>
+                </a>
 
-    <footer>
-        &copy; 2026 Janani Gopalakrishnan. All rights reserved. | Tarrant County College
+                <!-- 3. Lesson Generator (NEW LINK) -->
+                <a href="lesson_generator.html" class="interactive-card flex flex-col justify-between p-6 rounded-xl border border-emerald-100 bg-emerald-50/30 hover:bg-emerald-50 hover:border-emerald-200 shadow-sm group">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold mb-3">⚡</div>
+                        <h3 class="font-bold text-lg text-emerald-900 group-hover:text-emerald-800">Lesson Generator</h3>
+                        <p class="text-sm text-slate-600 mt-2">Dynamic planning engine to generate custom lecture plans, quizzes, and customized study targets.</p>
+                    </div>
+                    <span class="mt-5 inline-flex items-center text-sm font-semibold text-emerald-700 group-hover:underline">
+                        Open Generator &rarr;
+                    </span>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- Student Dashboard / Motivation Spot -->
+        <section class="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-2xl p-6 md:p-8 border border-blue-100">
+            <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+                <span>💡</span> Student Corner
+            </h2>
+            <p class="text-slate-600 mb-5 text-sm sm:text-base">Need some direction or advice to tackle your science courses today? Click below for a study tip.</p>
+            <button id="tip-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors duration-200 shadow-sm hover:shadow active:scale-95 transform">
+                Generate Study Tip
+            </button>
+            <div id="dynamic-message-box" class="hidden mt-5 p-4 bg-white rounded-xl border border-blue-100 shadow-inner">
+                <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 mb-1">Today's Tip</p>
+                <p id="dynamic-message" class="text-slate-700 italic font-medium"></p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Banner -->
+    <footer class="bg-slate-900 text-slate-400 py-10 px-4 mt-12 text-center text-sm border-t border-slate-800">
+        <p class="mb-2">&copy; 2026 Janani Gopalakrishnan. All rights reserved.</p>
+        <p class="text-slate-500">Department of Science | Tarrant County College</p>
     </footer>
 
+    <!-- Interactive Scripting -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const tips = [
-                "Consistency is key! Spend 15 minutes reviewing active recall cards today.",
-                "Don't just re-read notes. Try explaining cellular respiration to a peer or family member without looking at your book.",
-                "Take regular breaks using the Pomodoro technique—25 minutes of focus, 5 minutes of rest.",
-                "Forming study groups is an excellent way to consolidate and test your biological concepts."
+                "Consistency is key! Spend 15 minutes reviewing active recall questions today instead of cramming.",
+                "Don't just re-read notes. Try drawing the entire glycolysis process on a whiteboard from memory, then correct your mistakes in red.",
+                "Take structured breaks using the Pomodoro technique: 25 minutes of high-focus study, followed by a 5-minute movement break.",
+                "Forming small study circles is an exceptional method to discuss complex biochemical cycles and test each other's comprehension."
             ];
 
             const button = document.getElementById('tip-btn');
+            const messageBox = document.getElementById('dynamic-message-box');
             const output = document.getElementById('dynamic-message');
 
             button.addEventListener('click', () => {
                 const randomIndex = Math.floor(Math.random() * tips.length);
-                output.textContent = tips[randomIndex];
+                
+                // Show box and update content
+                messageBox.classList.remove('hidden');
+                output.textContent = `"${tips[randomIndex]}"`;
+                
+                // Light animation effect
+                messageBox.style.opacity = '0';
+                setTimeout(() => {
+                    messageBox.style.transition = 'opacity 0.3s ease';
+                    messageBox.style.opacity = '1';
+                }, 50);
             });
         });
     </script>
