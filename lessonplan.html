@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community College Lesson Prompt Builder</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d1d5db;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --success: #059669;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --radius: 14px;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .header {
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 850px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 20px;
+      align-items: start;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+    .field {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .hint {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      background: #fff;
+      color: var(--text);
+    }
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fafafa;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+    .checkbox-item input {
+      transform: scale(1.1);
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+    .primary:hover {
+      background: var(--accent-dark);
+    }
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .secondary:hover {
+      background: #d1d5db;
+    }
+    .success {
+      background: var(--success);
+      color: white;
+    }
+    .output-box {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 16px;
+      min-height: 520px;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.95rem;
+    }
+    .meta {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      margin-bottom: 10px;
+    }
+    .badge {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    @media (max-width: 920px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .output-box {
+        min-height: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Lesson Prompt Builder</h1>
+      <p>
+        Build a detailed instructional prompt in the voice of a community college professor.
+        This prompt is designed for use in visual AI platforms to generate lesson materials,
+        slides, modules, course visuals, and instructional experiences.
+      </p>
+    </div>
+    <div class="grid">
+      <section class="card">
+        <h2>Lesson Inputs</h2>
+        <div class="field">
+          <label for="title">Title of the lesson</label>
+          <input type="text" id="title" placeholder="Example: Introduction to Cellular Respiration" />
+        </div>
+        <div class="field">
+          <label for="objectives">Learning objectives</label>
+          <textarea id="objectives" placeholder="Enter one objective per line or separate with commas."></textarea>
+          <div class="hint">Use measurable outcomes such as explain, analyze, compare, design, or evaluate.</div>
+        </div>
+        <div class="field">
+          <label for="topics">Topics covered</label>
+          <textarea id="topics" placeholder="List the key concepts, subtopics, or units covered in this lesson."></textarea>
+        </div>
+        <div class="field">
+          <label for="terms">Key terms</label>
+          <textarea id="terms" placeholder="List vocabulary, formulas, concepts, or discipline-specific language."></textarea>
+        </div>
+        <div class="field">
+          <label for="audience">Audience</label>
+          <input type="text" id="audience" placeholder="Example: First-year community college biology students" />
+        </div>
+        <div class="field">
+          <label>Instructional elements to include</label>
+          <div class="checkbox-grid" id="activityOptions">
+            <label class="checkbox-item"><input type="checkbox" value="interactive activities" /> Interactive activities</label>
+            <label class="checkbox-item"><input type="checkbox" value="team projects" /> Team projects</label>
+            <label class="checkbox-item"><input type="checkbox" value="case studies" /> Case studies</label>
+            <label class="checkbox-item"><input type="checkbox" value="labs" /> Labs</label>
+            <label class="checkbox-item"><input type="checkbox" value="assessments" /> Assessments</label>
+          </div>
+          <div class="hint">Select as many as fit the lesson design.</div>
+        </div>
+        <div class="field">
+          <label for="ada">ADA compliance requirements</label>
+          <textarea id="ada" placeholder="Example: Use high-contrast design, readable fonts, alt text guidance, captioned media, accessible navigation, screen-reader-friendly structure."></textarea>
+        </div>
+        <div class="field">
+          <label for="analogies">Analogies and real-world examples</label>
+          <textarea id="analogies" placeholder="Example: Compare ATP to a rechargeable battery; connect metabolism to how the body uses food during exercise."></textarea>
+        </div>
+        <div class="controls">
+          <button class="primary" id="generateBtn">Generate Prompt</button>
+          <button class="secondary" id="copyBtn">Copy Prompt</button>
+          <button class="secondary" id="clearBtn">Clear Form</button>
+          <button class="success" id="loadExampleBtn">Load Example</button>
+        </div>
+        <div class="footer-note">
+          Tip: The generated prompt tells the AI to produce visually organized, accessible, student-centered lesson content suitable for community college instruction.
+        </div>
+      </section>
+      <section class="card">
+        <h2>Generated Prompt</h2>
+        <div class="badge-row" id="selectedBadges"></div>
+        <div class="output-box" id="output" aria-live="polite"></div>
+        <div class="meta" id="status">Fill in the form and click Generate Prompt.</div>
+      </section>
+    </div>
+  </div>
+  <script>
+    const titleEl = document.getElementById("title");
+    const objectivesEl = document.getElementById("objectives");
+    const topicsEl = document.getElementById("topics");
+    const termsEl = document.getElementById("terms");
+    const audienceEl = document.getElementById("audience");
+    const adaEl = document.getElementById("ada");
+    const analogiesEl = document.getElementById("analogies");
+    const outputEl = document.getElementById("output");
+    const statusEl = document.getElementById("status");
+    const selectedBadgesEl = document.getElementById("selectedBadges");
+    const generateBtn = document.getElementById("generateBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const loadExampleBtn = document.getElementById("loadExampleBtn");
+    function parseLinesOrCommas(text) {
+      return text
+        .split(/\n|,/)
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+    function getSelectedActivities() {
+      return Array.from(document.querySelectorAll('#activityOptions input[type="checkbox"]:checked'))
+        .map(cb => cb.value);
+    }
+    function renderBadges(items) {
+      selectedBadgesEl.innerHTML = "";
+      if (!items.length) return;
+      items.forEach(item => {
+        const span = document.createElement("span");
+        span.className = "badge";
+        span.textContent = item;
+        selectedBadgesEl.appendChild(span);
+      });
+    }
+    function buildPrompt() {
+      const title = titleEl.value.trim() || "[Insert lesson title]";
+      const objectives = parseLinesOrCommas(objectivesEl.value);
+      const topics = parseLinesOrCommas(topicsEl.value);
+      const terms = parseLinesOrCommas(termsEl.value);
+      const audience = audienceEl.value.trim() || "[Insert audience]";
+      const activities = getSelectedActivities();
+      const ada = parseLinesOrCommas(adaEl.value);
+      const analogies = parseLinesOrCommas(analogiesEl.value);
+      renderBadges(activities);
+      const objectivesText = objectives.length
+        ? objectives.map(item => `- ${item}`).join("\n")
+        : "- [Insert learning objectives]";
+      const topicsText = topics.length
+        ? topics.map(item => `- ${item}`).join("\n")
+        : "- [Insert topics covered]";
+      const termsText = terms.length
+        ? terms.map(item => `- ${item}`).join("\n")
+        : "- [Insert key terms]";
+      const activitiesText = activities.length
+        ? activities.map(item => `- ${item}`).join("\n")
+        : "- [Select at least one instructional element if needed]";
+      const adaText = ada.length
+        ? ada.map(item => `- ${item}`).join("\n")
+        : "- [Insert ADA compliance expectations]";
+      const analogiesText = analogies.length
+        ? analogies.map(item => `- ${item}`).join("\n")
+        : "- [Insert analogies and real-world examples]";
+      const prompt = `Create a visually engaging, instructionally strong lesson package in the voice and perspective of an experienced community college professor.
+Design the lesson for this audience:
+${audience}
+Lesson title:
+${title}
+Use these learning objectives:
+${objectivesText}
+Cover these topics:
+${topicsText}
+Include and clearly explain these key terms:
+${termsText}
+Build the lesson so it includes the following instructional elements:
+${activitiesText}
+Apply these ADA compliance and accessibility requirements throughout the lesson design:
+${adaText}
+Use these analogies and real-world examples to make the lesson practical and relatable:
+${analogiesText}
+Generate the output as a well-structured lesson concept for a visual AI platform. The response should:
+- Present content in a clear instructional sequence.
+- Use a student-centered teaching approach suitable for community college learners.
+- Balance rigor with accessibility and practical application.
+- Include visually organized sections for introduction, direct instruction, guided practice, active learning, and assessment.
+- Reflect inclusive teaching practices and accessible design.
+- Suggest where diagrams, icons, timelines, labeled illustrations, process graphics, or scenario-based visuals would improve understanding.
+- Include concise speaker guidance or instructor notes where useful.
+- Incorporate multiple ways for students to engage with the material.
+- Make the lesson realistic for a college classroom with varied student preparation levels.
+For the selected instructional elements, generate specific recommendations:
+- For interactive activities, include hands-on or discussion-based engagement tasks.
+- For team projects, include collaboration structure, roles, and deliverables.
+- For case studies, include realistic scenarios, guiding questions, and analysis tasks.
+- For labs, include purpose, materials, procedure overview, safety or compliance notes, and expected outcomes.
+- For assessments, include formative and summative checks for understanding.
+Format the response so it is easy to use in a visual content generation platform:
+- Use section headings.
+- Use concise but descriptive instructional language.
+- Keep content specific, classroom-ready, and visually mappable.
+- Emphasize clarity, accessibility, engagement, and real-world relevance.`;
+      outputEl.textContent = prompt;
+      statusEl.textContent = "Prompt generated and ready to copy.";
+    }
+    function copyPrompt() {
+      const text = outputEl.textContent.trim();
+      if (!text) {
+        statusEl.textContent = "Generate a prompt before copying.";
+        return;
+      }
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          statusEl.textContent = "Prompt copied to clipboard.";
+        })
+        .catch(() => {
+          statusEl.textContent = "Copy failed. Select and copy the prompt manually.";
+        });
+    }
+    function clearForm() {
+      titleEl.value = "";
+      objectivesEl.value = "";
+      topicsEl.value = "";
+      termsEl.value = "";
+      audienceEl.value = "";
+      adaEl.value = "";
+      analogiesEl.value = "";
+      document.querySelectorAll('#activityOptions input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+      });
+      selectedBadgesEl.innerHTML = "";
+      outputEl.textContent = "";
+      statusEl.textContent = "Form cleared.";
+    }
+    function loadExample() {
+      titleEl.value = "Introduction to Budgeting for College Students";
+      objectivesEl.value = [
+        "Explain the purpose of a personal budget",
+        "Differentiate fixed expenses from variable expenses",
+        "Create a basic monthly student budget",
+        "Evaluate spending choices using realistic scenarios"
+      ].join("\n");
+      topicsEl.value = [
+        "Income sources for students",
+        "Fixed and variable expenses",
+        "Needs versus wants",
+        "Savings strategies",
+        "Budget tracking tools"
+      ].join("\n");
+      termsEl.value = [
+        "budget",
+        "fixed expense",
+        "variable expense",
+        "net income",
+        "savings goal",
+        "discretionary spending"
+      ].join("\n");
+      audienceEl.value = "First-year community college students in a student success or personal finance course";
+      document.querySelectorAll('#activityOptions input[type="checkbox"]').forEach(cb => {
+        cb.checked = ["interactive activities", "case studies", "assessments"].includes(cb.value);
+      });
+      adaEl.value = [
+        "Use high-contrast colors",
+        "Provide captioning for any video content",
+        "Use readable sans-serif fonts",
+        "Include alt text guidance for visuals",
+        "Ensure screen-reader-friendly section structure",
+        "Avoid color-only meaning"
+      ].join("\n");
+      analogiesEl.value = [
+        "Compare a budget to a road map for money decisions",
+        "Relate savings to building a safety cushion like a spare tire",
+        "Use real student examples such as balancing work hours, rent, food, and transportation"
+      ].join("\n");
+      buildPrompt();
+      statusEl.textContent = "Example loaded.";
+    }
+    generateBtn.addEventListener("click", buildPrompt);
+    copyBtn.addEventListener("click", copyPrompt);
+    clearBtn.addEventListener("click", clearForm);
+    loadExampleBtn.addEventListener("click", loadExample);
+    [
+      titleEl,
+      objectivesEl,
+      topicsEl,
+      termsEl,
+      audienceEl,
+      adaEl,
+      analogiesEl
+    ].forEach(el => {
+      el.addEventListener("input", buildPrompt);
+    });
+    document.querySelectorAll('#activityOptions input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener("change", buildPrompt);
+    });
+    buildPrompt();
+  </script>
+</body>
+</html>
