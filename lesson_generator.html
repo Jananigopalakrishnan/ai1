@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive AI Prompt Generator</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --primary-color: #2b6cb0;
+            --primary-hover: #2c5282;
+            --border-color: #e2e8f0;
+            --accent-color: #edf2f7;
+            --success-color: #38a169;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a202c;
+            --container-bg: #2d3748;
+            --text-color: #e2e8f0;
+            --primary-color: #4299e1;
+            --primary-hover: #3182ce;
+            --border-color: #4a5568;
+            --accent-color: #1a202c;
+            --success-color: #48bb78;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        /* Toggle Button Styles for Prompt Components */
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--accent-color);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .toggle-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .toggle-btn input {
+            display: none;
+        }
+
+        /* Actions Section */
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        button.btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+
+        /* Output Preview Window */
+        .output-box {
+            margin-top: 30px;
+            background: var(--accent-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+            animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
+        }
+
+        @media print {
+            body { background: white; color: black; }
+            .container { box-shadow: none; padding: 0; }
+            .no-print { display: none !important; }
+            .output-box { border: none; background: transparent; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="no-print">
+        <h1>Lesson Plan Prompt Generator</h1>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
+    </header>
+
+    <div class="no-print">
+        <div class="form-group">
+            <label for="aiPlatform">1. Select Target AI Platform:</label>
+            <select id="aiPlatform" onchange="generatePrompt()">
+                <option value="ChatGPT (GPT-4o)">ChatGPT (GPT-4o)</option>
+                <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet</option>
+                <option value="Google Gemini 1.5 Pro">Google Gemini 1.5 Pro</option>
+                <option value="Microsoft Copilot">Microsoft Copilot</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="lessonSubject">2. Select/Enter Lesson Subject:</label>
+            <input type="text" id="lessonSubject" list="subjects" placeholder="e.g., Photosynthesis, Linear Equations, World War I" oninput="generatePrompt()">
+            <datalist id="subjects">
+                <option value="Biology">
+                <option value="Algebra">
+                <option value="World History">
+                <option value="Creative Writing">
+                <option value="Computer Science">
+            </datalist>
+        </div>
+
+        <label>3. Select Prompt Components to Include:</label>
+        <div class="component-grid">
+            <label class="toggle-btn active"><input type="checkbox" id="incTitle" checked onchange="handleToggle(this)"> Lesson Title</label>
+            <label class="toggle-btn active"><input type="checkbox" id="incObjectives" checked onchange="handleToggle(this)"> Learning Objectives</label>
+            <label class="toggle-btn active"><input type="checkbox" id="incPreTest" checked onchange="handleToggle(this)"> Pre-Test</label>
+            <label class="toggle-btn active"><input type="checkbox" id="incConcepts" checked onchange="handleToggle(this)"> Key Concepts</label>
+            <label class="toggle-btn active"><input type="checkbox" id="incContent" checked onchange="handleToggle(this)"> Core Content</label>
+            <label class="toggle-btn active"><input type="checkbox" id="incAnalogies" checked onchange="handleToggle(this)"> Analogies & Examples</label>
+            <label class="toggle-btn active"><input type="checkbox" id="incSummary" checked onchange="handleToggle(this)"> Summary</label>
+            <label class="toggle-btn active"><input type="checkbox" id="incQuiz" checked onchange="handleToggle(this)"> Review Quiz</label>
+            <label class="toggle-btn active"><input type="checkbox" id="incAda" checked onchange="handleToggle(this)"> ADA Checklist</label>
+        </div>
+    </div>
+
+    <div class="output-box">
+        <div class="output-header">
+            <span>Generated AI Prompt Preview</span>
+            <span id="platformTag" style="font-size: 0.85rem; opacity: 0.7;"></span>
+        </div>
+        <pre id="promptResult">Your generated prompt will appear here as you select options...</pre>
+    </div>
+
+    <div class="actions no-print">
+        <button class="btn btn-primary" onclick="copyPrompt()">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 4px;"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+            Copy Prompt
+        </button>
+        <button class="btn btn-secondary" onclick="window.print()">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 4px;"><path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/></svg>
+            Print / Download PDF
+        </button>
+    </div>
+</div>
+
+<div class="toast" id="toast">Prompt copied to clipboard!</div>
+
+<script>
+    // Theme Switcher Functionality
+    function toggleTheme() {
+        const body = document.documentElement;
+        const currentTheme = body.getAttribute('data-theme');
+        const themeBtn = document.getElementById('themeToggle');
+        
+        if (currentTheme === 'dark') {
+            body.removeAttribute('data-theme');
+            themeBtn.innerText = 'Dark Mode';
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            themeBtn.innerText = 'Light Mode';
+        }
+    }
+
+    // Toggle styling wrapper for checkbox selections
+    function handleToggle(checkbox) {
+        if(checkbox.checked) {
+            checkbox.parentElement.classList.add('active');
+        } else {
+            checkbox.parentElement.classList.remove('active');
+        }
+        generatePrompt();
+    }
+
+    // Dynamic Prompt Builder
+    function generatePrompt() {
+        const platform = document.getElementById('aiPlatform').value;
+        const subject = document.getElementById('lessonSubject').value || "[Insert Subject Here]";
+        
+        document.getElementById('platformTag').innerText = `Optimized for: ${platform}`;
+
+        let prompt = `You are an expert instructional designer. Optimize your output parameters for execution on ${platform}.\n\n`;
+        prompt += `Please generate a comprehensive, highly engaging educational lesson block focused on the subject: "${subject}".\n\n`;
+        prompt += `Structure the response exactly using the following requested modules:\n`;
+        prompt += `================================================================\n\n`;
+
+        if(document.getElementById('incTitle').checked) {
+            prompt += `[LESSON TITLE]\n- Create a catchy, clear, and age-appropriate title for this lesson module.\n\n`;
+        }
+        if(document.getElementById('incObjectives').checked) {
+            prompt += `[LEARNING OBJECTIVES]\n- State 2-3 measurable learner outcomes using Bloom's Taxonomy.\n\n`;
+        }
+        if(document.getElementById('incPreTest').checked) {
+            prompt += `[PRE-TEST]\n- Provide a 3-question diagnostic pre-test to gauge baseline understanding prior to learning.\n\n`;
+        }
+        if(document.getElementById('incConcepts').checked) {
+            prompt += `[KEY CONCEPTS]\n- Outline and define the core vocabulary terms and foundational frameworks.\n\n`;
+        }
+        if(document.getElementById('incContent').checked) {
+            prompt += `[CORE CONTENT]\n- Deliver the main instructional text broken down into clean, digestible sub-headers.\n\n`;
+        }
+        if(document.getElementById('incAnalogies').checked) {
+            prompt += `[ANALOGIES & EXAMPLES]\n- Provide at least one vivid real-world analogy and practical example to ground the abstract concepts.\n\n`;
+        }
+        if(document.getElementById('incSummary').checked) {
+            prompt += `[SUMMARY]\n- Give a brief, high-impact bulleted TL;DR wrapping up the key takeaways.\n\n`;
+        }
+        if(document.getElementById('incQuiz').checked) {
+            prompt += `[REVIEW QUIZ]\n- Formulate a 5-question multiple-choice review assessment complete with an answer key and explanatory feedback.\n\n`;
+        }
+        if(document.getElementById('incAda').checked) {
+            prompt += `[ADA COMPLIANCE CHECKLIST]\n- Ensure structural accessibility. Verify that suggestions for text descriptions for any visual elements are included, alternative text is thought out, structure is strictly semantic, and readability accommodations are recommended.\n\n`;
+        }
+
+        prompt += `================================================================\n`;
+        prompt += `Begin your response directly with the first module. Maintain an encouraging, educational tone throughout.`;
+
+        document.getElementById('promptResult').textContent = prompt;
+    }
+
+    // Copy to Clipboard Action
+    function copyPrompt() {
+        const textToCopy = document.getElementById('promptResult').textContent;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        });
+    }
+
+    // Initialize prompt on file load
+    window.onload = generatePrompt;
+</script>
+
+</body>
+</html>
