@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photosynthesis: Interactive Learning Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Custom styling for smooth transitions and scrollbars -->
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+        }
+        .floating-leaf {
+            animation: float-slow 4s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.5)); }
+            50% { opacity: 1; filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.8)); }
+        }
+        .photon-glow {
+            animation: pulse-glow 2s infinite;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans text-slate-800 antialiased overflow-hidden">
+
+    <!-- Top Banner: Professor Introduction Header -->
+    <header class="bg-emerald-900 text-white shrink-0 border-b-4 border-emerald-700 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-emerald-800 rounded-lg shadow-inner">
+                    <svg class="w-8 h-8 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">Photosynthesis: Solar Powering the Biosphere</h1>
+                    <p class="text-xs md:text-sm text-emerald-300">General Biology &bull; Dr. Gopalakrishnan's Interactive Learning Companion</p>
+                </div>
+            </div>
+            <!-- Quick Formula Reference Badge -->
+            <div class="bg-emerald-950 px-3 py-1.5 rounded-md text-xs md:text-sm font-mono text-emerald-200 shadow-inner border border-emerald-800/50 flex items-center gap-2">
+                <span class="text-amber-400 font-bold">Equation:</span>
+                Light + 6CO2 + 6H2O &rarr; C6H12O6 + 6O2
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <nav class="w-64 bg-slate-900 text-slate-300 shrink-0 hidden md:flex flex-col border-r border-slate-800 justify-between">
+            <div class="p-4 flex-1 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
+                <span class="text-xs font-bold tracking-wider uppercase text-slate-500 px-3 mb-2 block">Foundations</span>
+                <button onclick="switchTab('tab-welcome')" id="btn-tab-welcome" class="nav-btn active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    <span>Intro & Analogies</span>
+                </button>
+                <button onclick="switchTab('tab-autotroph')" id="btn-tab-autotroph" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    <span>Producers vs Consumers</span>
+                </button>
+
+                <span class="text-xs font-bold tracking-wider uppercase text-slate-500 px-3 mt-6 mb-2 block">Inner Workings</span>
+                <button onclick="switchTab('tab-chloroplast')" id="btn-tab-chloroplast" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    <span>Chloroplast Anatomy</span>
+                </button>
+                <button onclick="switchTab('tab-light')" id="btn-tab-light" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span>Light Reactions Power</span>
+                </button>
+                <button onclick="switchTab('tab-calvin')" id="btn-tab-calvin" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    <span>Calvin Cycle Kitchen</span>
+                </button>
+
+                <span class="text-xs font-bold tracking-wider uppercase text-slate-500 px-3 mt-6 mb-2 block">Adaptation & Practice</span>
+                <button onclick="switchTab('tab-adaptations')" id="btn-tab-adaptations" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2m4-1c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <span>C3, C4 & CAM Plants</span>
+                </button>
+                <button onclick="switchTab('tab-lab')" id="btn-tab-lab" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    <span class="text-amber-300 font-bold">Virtual Leaf Disk Lab</span>
+                </button>
+                <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    <span>Interactive Exam Suite</span>
+                </button>
+            </div>
+            <!-- Professor Persona Footer -->
+            <div class="p-4 border-t border-slate-800 bg-slate-950 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-700 flex items-center justify-center text-white font-bold text-lg border border-emerald-500 shadow-sm">
+                    DrJ
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-200">Dr. Gopalakrishnan</h4>
+                    <p class="text-[10px] text-slate-500">Online Office Hours: Open</p>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <main class="flex-1 bg-slate-100 flex flex-col overflow-hidden relative">
+            
+            <!-- Mobile Navigation Bar -->
+            <div class="md:hidden shrink-0 bg-slate-900 border-b border-slate-800 text-slate-300 px-4 py-2 flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase text-emerald-400">Jump To Module:</span>
+                <select id="mobile-nav" onchange="switchTab(this.value)" class="bg-slate-800 border border-slate-700 text-xs rounded px-2.5 py-1 text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    <option value="tab-welcome">1. Welcome & Analogies</option>
+                    <option value="tab-autotroph">2. Producers vs Consumers</option>
+                    <option value="tab-chloroplast">3. Chloroplast Anatomy</option>
+                    <option value="tab-light">4. Light Reactions Power</option>
+                    <option value="tab-calvin">5. Calvin Cycle Kitchen</option>
+                    <option value="tab-adaptations">6. Adaptations (C3, C4, CAM)</option>
+                    <option value="tab-lab">7. Virtual Leaf Disk Lab</option>
+                    <option value="tab-quiz">8. Exam Suite</option>
+                </select>
+            </div>
+
+            <!-- Tab Panels Wrapper -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar" id="tab-container">
+                
+                <!-- Tab: Welcome -->
+                <div id="tab-welcome" class="tab-panel flex flex-col gap-6 max-w-5xl mx-auto">
+                    <!-- Welcoming Banner from the Professor -->
+                    <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-6 md:p-8 rounded-2xl shadow-lg relative overflow-hidden">
+                        <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-12 translate-y-12">
+                            <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                        </div>
+                        <div class="relative z-10 max-w-2xl">
+                            <span class="bg-emerald-600/50 text-emerald-200 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Course Guide</span>
+                            <h2 class="text-2xl md:text-3xl font-extrabold mt-3 tracking-tight">"Where does breakfast really come from?"</h2>
+                            <p class="text-emerald-100 text-base md:text-lg mt-2 leading-relaxed font-serif italic">
+                                "Welcome to the solar kitchen of the biosphere. If you trace the energy in your cereal or coffee back to its inception, you will find yourself standing before a plant bathed in pure starlight. Let's study how plants turn photons into chemical fuel."
+                            </p>
+                            <div class="flex gap-4 mt-6">
+                                <button onclick="switchTab('tab-autotroph')" class="bg-amber-400 hover:bg-amber-500 text-slate-900 text-sm font-bold px-5 py-3 rounded-lg shadow transition-transform active:scale-95">
+                                    Start Learning &rarr;
+                                </button>
+                                <button onclick="switchTab('tab-lab')" class="bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-bold px-5 py-3 rounded-lg border border-emerald-500/30 shadow transition-transform active:scale-95">
+                                    Go to Virtual Lab
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Core Pedagogical Analogies Grid -->
+                    <div>
+                        <h3 class="text-lg md:text-xl font-bold text-slate-800 mb-4 border-b pb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            Dr. Gopalakrishnan's Thematic Analogies
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- Analogy 1 -->
+                            <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 mb-3">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-base">The Battery Analogy</h4>
+                                <p class="text-xs md:text-sm text-slate-500 mt-1.5 leading-relaxed">
+                                    <strong>ADP / NADP+</strong> are empty, uncharged batteries. <strong>ATP / NADPH</strong> are fully-charged, chemical batteries conveying electricity directly to the sugar bakery.
+                                </p>
+                            </div>
+                            <!-- Analogy 2 -->
+                            <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="w-12 h-12 rounded-lg bg-sky-100 flex items-center justify-center text-sky-600 mb-3">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-base">The Solar Panel Array</h4>
+                                <p class="text-xs md:text-sm text-slate-500 mt-1.5 leading-relaxed">
+                                    <strong>Chlorophylls</strong> are chemical solar panels, absorbing light photons and concentrating that electricity to the central chemical inverter (the reaction center).
+                                </p>
+                            </div>
+                            <!-- Analogy 3 -->
+                            <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 mb-3">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-base">The Busy Kitchen</h4>
+                                <p class="text-xs md:text-sm text-slate-500 mt-1.5 leading-relaxed">
+                                    The <strong>Calvin Cycle</strong> is a biochemical bakery. <strong>CO2</strong> is atmospheric flour, <strong>Rubisco</strong> is the chief chef, and the final <strong>G3P</strong> compound is fresh sweet dough!
+                                </p>
+                            </div>
+                            <!-- Analogy 4 -->
+                            <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="w-12 h-12 rounded-lg bg-rose-100 flex items-center justify-center text-rose-600 mb-3">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-base">Desert Business Hours</h4>
+                                <p class="text-xs md:text-sm text-slate-500 mt-1.5 leading-relaxed">
+                                    <strong>C3, C4, and CAM</strong> represent three corporate operating hours: C3 opens anytime; C4 isolates functions spatially; and CAM operates only at night to save water.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Autotroph vs Heterotroph -->
+                <div id="tab-autotroph" class="tab-panel hidden flex flex-col gap-6 max-w-5xl mx-auto">
+                    <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">Module 1: Autotrophs vs. Heterotrophs</h2>
+                        <p class="text-base text-slate-500">Every living cell needs organic carbon and energy, but where and how they obtain them forms the grand ecological division of the living world.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                            <!-- Autotrophs Card -->
+                            <div class="bg-emerald-50/50 border border-emerald-200/60 p-6 rounded-xl">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-base shadow">A</span>
+                                    <h3 class="text-lg font-bold text-emerald-800">Autotrophs ("Self-Feeders")</h3>
+                                </div>
+                                <p class="text-sm text-emerald-700 leading-relaxed mb-4">
+                                    These organisms can construct complex organic chemical energy storage compounds (like glucose) directly from inorganic minerals, carbon dioxide, and ambient external energy (like sunlight).
+                                </p>
+                                <ul class="text-sm text-emerald-800/80 space-y-2 list-disc pl-5">
+                                    <li><strong>Photoautotrophs:</strong> Harness photons (solar energy). (e.g. Trees, phytoplankton, cyanobacteria).</li>
+                                    <li><strong>Chemoautotrophs:</strong> Harness energy from chemical bonds of inorganic compounds (e.g. Deep-sea sulfur vents).</li>
+                                </ul>
+                            </div>
+
+                            <!-- Heterotrophs Card -->
+                            <div class="bg-amber-50/50 border border-amber-200/60 p-6 rounded-xl">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="w-9 h-9 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-base shadow">H</span>
+                                    <h3 class="text-lg font-bold text-amber-800">Heterotrophs ("Other-Feeders")</h3>
+                                </div>
+                                <p class="text-sm text-amber-700 leading-relaxed mb-4">
+                                    These organisms cannot build their own carbon structures from inorganic compounds. They are dependent on taking in other carbon compounds by eating organic materials.
+                                </p>
+                                <ul class="text-sm text-amber-800/80 space-y-2 list-disc pl-5">
+                                    <li><strong>Consumers:</strong> Eat living autotrophs or other consumers (e.g. Deer, lions, humans).</li>
+                                    <li><strong>Decomposers / Saprotrophs:</strong> Absorb organic energy from dead or decomposing organic waste (e.g. Mushrooms, soil bacteria).</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Active Learning Prompt -->
+                        <div class="bg-slate-100 p-5 rounded-xl mt-6 border border-slate-200/60 flex items-start gap-3">
+                            <span class="text-2xl mt-0.5">💡</span>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Interactive Question:</h4>
+                                <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">If a volcanic ash cloud blocks all sunlight on Earth for three consecutive years, what happens to the heterotrophic organisms on the surface? Why are they completely dependent on autotrophs?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Chloroplast Anatomy -->
+                <div id="tab-chloroplast" class="tab-panel hidden flex flex-col gap-6 max-w-5xl mx-auto">
+                    <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800">Module 2: The Chloroplast Anatomy & Pigments</h2>
+                                <p class="text-base text-slate-500">A structured double-membrane factory built for compartmentalization.</p>
+                            </div>
+                            <span class="text-xs bg-slate-200 text-slate-700 font-mono px-3 py-1.5 rounded-full self-start">Interactive Explorer</span>
+                        </div>
+
+                        <!-- Chloroplast Diagram Interface -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+                            
+                            <!-- Interactive SVG Diagram Container -->
+                            <div class="lg:col-span-7 bg-slate-900 rounded-xl p-4 flex flex-col items-center justify-center relative shadow-inner min-h-[350px]">
+                                <h3 class="absolute top-3 left-3 text-xs font-mono text-emerald-400">Interactive Chloroplast Map</h3>
+                                <p class="absolute bottom-3 left-3 text-xs text-slate-400">Click on any highlighted structure to view details</p>
+                                
+                                <!-- Chloroplast SVG -->
+                                <svg class="w-full max-w-[400px] h-auto" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Outer Membrane -->
+                                    <ellipse cx="200" cy="150" rx="180" ry="120" stroke="#047857" stroke-width="4" fill="#064e3b" class="cursor-pointer hover:stroke-amber-400 transition-colors" onclick="showChloroplastPart('outer')"/>
+                                    <!-- Inner Membrane -->
+                                    <ellipse cx="200" cy="150" rx="170" ry="110" stroke="#059669" stroke-width="2" fill="#022c22" class="cursor-pointer hover:stroke-amber-400 transition-colors" onclick="showChloroplastPart('inner')"/>
+                                    
+                                    <!-- Stroma (Empty Fluid Area Inside Inner Membrane) -->
+                                    <ellipse cx="200" cy="150" rx="160" ry="100" fill="transparent" class="cursor-pointer" onclick="showChloroplastPart('stroma')"/>
+                                    
+                                    <!-- Grana Stacks -->
+                                    <!-- Stack 1 (Left) -->
+                                    <g class="cursor-pointer hover:opacity-80 transition-opacity" onclick="showChloroplastPart('granum')">
+                                        <ellipse cx="120" cy="140" rx="30" ry="10" fill="#10b981" stroke="#047857" stroke-width="2"/>
+                                        <ellipse cx="120" cy="150" rx="30" ry="10" fill="#10b981" stroke="#047857" stroke-width="2"/>
+                                        <ellipse cx="120" cy="160" rx="30" ry="10" fill="#10b981" stroke="#047857" stroke-width="2"/>
+                                    </g>
+                                    <!-- Stack 2 (Right) -->
+                                    <g class="cursor-pointer hover:opacity-80 transition-opacity" onclick="showChloroplastPart('granum')">
+                                        <ellipse cx="280" cy="130" rx="30" ry="10" fill="#10b981" stroke="#047857" stroke-width="2"/>
+                                        <ellipse cx="280" cy="140" rx="30" ry="10" fill="#10b981" stroke="#047857" stroke-width="2"/>
+                                        <ellipse cx="280" cy="150" rx="30" ry="10" fill="#10b981" stroke="#047857" stroke-width="2"/>
+                                        <ellipse cx="280" cy="160" rx="30" ry="10" fill="#10b981" stroke="#047857" stroke-width="2"/>
+                                    </g>
+                                    <!-- Stack 3 (Center) -->
+                                    <g class="cursor-pointer hover:opacity-80 transition-opacity" onclick="showChloroplastPart('thylakoid')">
+                                        <ellipse cx="200" cy="170" rx="35" ry="12" fill="#34d399" stroke="#047857" stroke-width="2"/>
+                                        <ellipse cx="200" cy="182" rx="35" ry="12" fill="#34d399" stroke="#047857" stroke-width="2"/>
+                                    </g>
+                                    
+                                    <!-- Connections (Stroma Lamellae) -->
+                                    <path d="M 120 160 Q 160 180 200 170" stroke="#047857" stroke-width="3" fill="none"/>
+                                    <path d="M 200 182 Q 240 182 280 160" stroke="#047857" stroke-width="3" fill="none"/>
+
+                                    <!-- Invisible Pointer Tooltips / Click Spots -->
+                                    <circle cx="200" cy="170" r="15" fill="red" class="opacity-0 cursor-pointer" onclick="showChloroplastPart('lumen')"/>
+                                </svg>
+                            </div>
+
+                            <!-- Explanatory Information Cards panel (Changes dynamically) -->
+                            <div class="lg:col-span-5 flex flex-col justify-between bg-slate-50 border border-slate-200 rounded-xl p-6">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span id="chloro-title" class="text-xs uppercase font-extrabold tracking-wider text-emerald-800">Select an Area</span>
+                                    </div>
+                                    <h3 id="chloro-name" class="text-xl font-bold text-slate-800">Chloroplast Interactive Guide</h3>
+                                    <p id="chloro-desc" class="text-sm text-slate-600 mt-2 leading-relaxed">
+                                        Click on the interactive diagram on the left to reveal chloroplast structure details, anatomical functions, and professor notes about that specific component.
+                                    </p>
+                                </div>
+                                <div class="bg-emerald-950 text-emerald-100 p-5 rounded-lg mt-4 border border-emerald-800" id="chloro-note-box">
+                                    <h4 class="text-xs uppercase font-bold text-amber-400 tracking-wider">Professor's Field Note:</h4>
+                                    <p id="chloro-note" class="text-sm mt-1.5 font-serif italic leading-relaxed">
+                                        "Why are thylakoids stacked? It increases the surface area for maximum pigment integration, allowing the plant to absorb as many photons of light as possible in a limited physical space."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pigment Spectrum Component -->
+                        <div class="border-t border-slate-200 mt-6 pt-6">
+                            <h3 class="text-base font-bold text-slate-800 mb-3">Understanding the Absorption Spectrum</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                                Chlorophylls (a and b) are the main pigments. They absorb blue and red light and reflect green light. This reflected light is why foliage appears green to our eyes.
+                            </p>
+                            <!-- Pigment Spectrum Bar Slider -->
+                            <div class="bg-gradient-to-r from-violet-600 via-blue-500 via-green-500 via-yellow-400 to-red-600 h-12 rounded-lg relative overflow-hidden flex shadow-inner border border-slate-200">
+                                <div class="absolute inset-0 bg-white/10 flex items-center justify-between text-xs font-bold text-white px-4">
+                                    <span>Violet (400nm) - High Absorption</span>
+                                    <span class="text-slate-900 bg-white/70 px-2 py-1 rounded">Green (550nm) - Reflected!</span>
+                                    <span>Red (700nm) - High Absorption</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Light Reactions Power -->
+                <div id="tab-light" class="tab-panel hidden flex flex-col gap-6 max-w-5xl mx-auto">
+                    <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800">Module 3: Light-Dependent Power Grid</h2>
+                                <p class="text-base text-slate-500">Watch the energy transfer pathways and trace high-energy electron cascades.</p>
+                            </div>
+                            <!-- Switch Pathway Toggles -->
+                            <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200 self-start">
+                                <button onclick="setLightPath('linear')" id="btn-path-linear" class="path-toggle active px-4 py-2 rounded-md text-sm font-bold transition-all duration-150">
+                                    Linear (Non-Cyclic)
+                                </button>
+                                <button onclick="setLightPath('cyclic')" id="btn-path-cyclic" class="path-toggle px-4 py-2 rounded-md text-sm font-bold transition-all duration-150">
+                                    Cyclic Flow
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Energy Pathway Sandbox -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+                            <!-- Visual Pipeline Simulator -->
+                            <div class="lg:col-span-8 bg-slate-950 p-6 rounded-xl relative shadow-inner min-h-[300px] flex flex-col justify-between">
+                                <div class="absolute top-4 left-4 z-10">
+                                    <span class="bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold px-2.5 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider" id="pathway-indicator">
+                                        Non-Cyclic Pathway Active
+                                    </span>
+                                </div>
+                                
+                                <!-- Diagram Area -->
+                                <div class="flex-1 flex items-center justify-around relative py-8">
+                                    <!-- Light Wave Animation Indicator -->
+                                    <div class="absolute left-6 top-6 photon-glow flex flex-col items-center">
+                                        <div class="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center text-slate-900 font-bold text-sm shadow-lg">☼</div>
+                                        <span class="text-xs text-amber-400 font-mono mt-1">Light (Photons)</span>
+                                    </div>
+
+                                    <!-- Photosystem II Box -->
+                                    <div class="w-28 h-28 rounded-lg bg-emerald-900 border-2 border-emerald-500 flex flex-col items-center justify-center text-center p-3 relative shadow-lg" id="ps2-card">
+                                        <span class="text-xs uppercase font-bold tracking-wide text-emerald-300">PS II</span>
+                                        <span class="text-xs font-mono text-emerald-400">P680</span>
+                                        <span class="text-xs mt-1.5 text-slate-300 font-serif" id="ps2-status">Active</span>
+                                        <!-- Water Splitter label -->
+                                        <div class="absolute -bottom-10 bg-blue-900/40 border border-blue-500/30 text-[10px] text-blue-200 px-2 py-1 rounded-md" id="ps2-sublabel">
+                                            H2O &rarr; 2H+ + O2
+                                        </div>
+                                    </div>
+
+                                    <!-- Electron Transport Chain Arrow Staircase -->
+                                    <div class="flex flex-col items-center gap-1" id="etc-card">
+                                        <div class="flex items-center gap-1">
+                                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-mono">ETC</span>
+                                        </div>
+                                        <div class="flex gap-1.5">
+                                            <div class="w-6 h-6 rounded bg-slate-800 border border-slate-700 text-slate-400 flex items-center justify-center text-xs">PQ</div>
+                                            <div class="w-6 h-6 rounded bg-slate-800 border border-slate-700 text-slate-400 flex items-center justify-center text-xs">Cyt</div>
+                                            <div class="w-6 h-6 rounded bg-slate-800 border border-slate-700 text-slate-400 flex items-center justify-center text-xs">PC</div>
+                                        </div>
+                                        <span class="text-[10px] text-amber-500 font-mono">Generates H+ Gradient</span>
+                                    </div>
+
+                                    <!-- Photosystem I Box -->
+                                    <div class="w-28 h-28 rounded-lg bg-emerald-900 border-2 border-emerald-500 flex flex-col items-center justify-center text-center p-3 relative shadow-lg">
+                                        <span class="text-xs uppercase font-bold tracking-wide text-emerald-300">PS I</span>
+                                        <span class="text-xs font-mono text-emerald-400">P700</span>
+                                        <span class="text-xs mt-1.5 text-slate-300 font-serif">Active</span>
+                                        <div class="absolute -bottom-10 bg-amber-950 border border-amber-500/30 text-[10px] text-amber-200 px-2 py-1 rounded-md">
+                                            Absorbs Light
+                                        </div>
+                                    </div>
+
+                                    <!-- Product End Terminal -->
+                                    <div class="flex flex-col gap-2.5 items-center justify-center" id="product-card">
+                                        <div class="px-3 py-1.5 rounded bg-teal-800 text-xs text-teal-100 font-bold border border-teal-500" id="nadph-badge">
+                                            NADPH Output
+                                        </div>
+                                        <div class="px-3 py-1.5 rounded bg-orange-800 text-xs text-orange-100 font-bold border border-orange-500 animate-bounce">
+                                            ATP Output
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step Explanation Footer -->
+                                <div class="bg-slate-900/80 p-3.5 rounded border border-slate-800 mt-4">
+                                    <p id="pathway-desc" class="text-sm text-slate-300 leading-relaxed">
+                                        <strong>Linear Pathway:</strong> Standard one-way pipeline. Electrons originate from water splitting (photolysis), pass down the ETC to Photosystem I, and are loaded onto NADP+ to form NADPH.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Structural Comparison Panel -->
+                            <div class="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col justify-between">
+                                <div>
+                                    <h3 class="text-base font-bold text-slate-800 mb-2">Linear vs. Cyclic Matrix</h3>
+                                    <p class="text-sm text-slate-600 mb-4 leading-relaxed">The Calvin cycle requires a precise ratio of 9 ATP to 6 NADPH molecules to synthesize one sugar G3P. The plant uses cyclic routing to balance these values.</p>
+                                    
+                                    <div class="space-y-3.5">
+                                        <div class="flex items-start gap-2.5">
+                                            <div class="w-2 h-2 rounded-full bg-emerald-600 mt-2"></div>
+                                            <div class="text-sm">
+                                                <span class="font-bold text-slate-700 block">Linear Photophosphorylation</span>
+                                                <span class="text-slate-500 leading-relaxed">Triggers photolysis, releases oxygen gas (O2), and creates a balance of ATP and NADPH.</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-2.5">
+                                            <div class="w-2 h-2 rounded-full bg-emerald-600 mt-2"></div>
+                                            <div class="text-sm">
+                                                <span class="font-bold text-slate-700 block">Cyclic Photophosphorylation</span>
+                                                <span class="text-slate-500 leading-relaxed">Only cycles electrons around PS I. Does not split water, does not generate NADPH, but pumps protons to produce extra ATP.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-emerald-950 p-4 rounded-xl border border-emerald-800 mt-6">
+                                    <span class="text-xs uppercase tracking-wider font-extrabold text-amber-400">Class Quiz Connection</span>
+                                    <p class="text-xs md:text-sm text-emerald-200 mt-1.5 font-serif italic leading-relaxed">
+                                        "A targeted herbicide that blocks NADP+ reductase will halt linear flow completely, but leaves cyclic photophosphorylation intact to pump protons for ATP generation!"
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Calvin Cycle Kitchen -->
+                <div id="tab-calvin" class="tab-panel hidden flex flex-col gap-6 max-w-5xl mx-auto">
+                    <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800">Module 4: The Calvin Cycle "Sugar Kitchen"</h2>
+                                <p class="text-base text-slate-500">Take charge of Carbon Fixation, Reduction, and Regeneration phases step-by-step.</p>
+                            </div>
+                            <button onclick="resetBakery()" class="text-xs bg-slate-200 text-slate-700 font-mono px-3.5 py-2 rounded-lg border hover:bg-slate-300 transition-colors">
+                                Reset Cycle Progress
+                            </button>
+                        </div>
+
+                        <!-- Kitchen Workflow Map -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+                            
+                            <!-- Steps Pipeline -->
+                            <div class="lg:col-span-8 bg-amber-50/20 border border-amber-200/50 rounded-xl p-5 relative shadow-inner">
+                                <h3 class="text-sm uppercase font-extrabold tracking-wider text-amber-800 mb-4 flex items-center gap-1.5">
+                                    <span>🍳</span>
+                                    Bakery Production Pipeline
+                                </h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="bakery-pipeline">
+                                    <!-- Phase 1 Card -->
+                                    <div class="bg-white p-5 rounded-lg border border-slate-200 relative transition-all duration-300 shadow-sm" id="p1-card">
+                                        <div class="absolute -top-3 left-3 bg-red-600 text-white font-mono text-xs px-2.5 py-0.5 rounded-md font-bold uppercase">
+                                            Phase 1
+                                        </div>
+                                        <h4 class="font-bold text-base text-slate-800 mt-2">Carbon Fixation</h4>
+                                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                                            Rubisco attaches carbon dioxide from air to the 5-carbon RuBP (ribulose-1,5-bisphosphate) sugar to form 3-PGA (3-phosphoglycerate).
+                                        </p>
+                                        <div class="mt-4 flex flex-col gap-2">
+                                            <button onclick="runBakeryStep(1)" id="btn-bakery-1" class="w-full bg-red-600 text-white text-xs font-bold py-2 rounded shadow active:scale-95 transition-transform">
+                                                Add CO2 via Rubisco
+                                            </button>
+                                            <div class="text-xs text-center font-mono text-slate-400 py-1" id="bakery-step-status-1">
+                                                Waiting for inputs...
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Phase 2 Card -->
+                                    <div class="bg-white p-5 rounded-lg border border-slate-200 opacity-50 relative transition-all duration-300 shadow-sm" id="p2-card">
+                                        <div class="absolute -top-3 left-3 bg-blue-600 text-white font-mono text-xs px-2.5 py-0.5 rounded-md font-bold uppercase">
+                                            Phase 2
+                                        </div>
+                                        <h4 class="font-bold text-base text-slate-800 mt-2">Reduction Step</h4>
+                                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                                            Uncharged ATP & NADPH chemical power reduces 3-PGA intermediates to generate G3P (glyceraldehyde-3-phosphate) sugar.
+                                        </p>
+                                        <div class="mt-4 flex flex-col gap-2">
+                                            <button onclick="runBakeryStep(2)" id="btn-bakery-2" disabled class="w-full bg-blue-600 text-white text-xs font-bold py-2 rounded shadow active:scale-95 transition-transform disabled:opacity-50">
+                                                Fuel ATP & NADPH
+                                            </button>
+                                            <div class="text-xs text-center font-mono text-slate-400 py-1" id="bakery-step-status-2">
+                                                Locked
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Phase 3 Card -->
+                                    <div class="bg-white p-5 rounded-lg border border-slate-200 opacity-50 relative transition-all duration-300 shadow-sm" id="p3-card">
+                                        <div class="absolute -top-3 left-3 bg-purple-600 text-white font-mono text-xs px-2.5 py-0.5 rounded-md font-bold uppercase">
+                                            Phase 3
+                                        </div>
+                                        <h4 class="font-bold text-base text-slate-800 mt-2">Regeneration</h4>
+                                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                                            Excess carbons are restructured using ATP back into the initial RuBP carrier molecules to reset the cycle.
+                                        </p>
+                                        <div class="mt-4 flex flex-col gap-2">
+                                            <button onclick="runBakeryStep(3)" id="btn-bakery-3" disabled class="w-full bg-purple-600 text-white text-xs font-bold py-2 rounded shadow active:scale-95 transition-transform disabled:opacity-50">
+                                                Rebuild RuBP Carrier
+                                                </button>
+                                            <div class="text-xs text-center font-mono text-slate-400 py-1" id="bakery-step-status-3">
+                                                Locked
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chef's Counter Panel (Outputs) -->
+                            <div class="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col justify-between">
+                                <div>
+                                    <h3 class="text-base font-bold text-slate-800 mb-2">The Chef's Counter</h3>
+                                    <p class="text-sm text-slate-600 mb-4">Every successful completion of 3 turns yields 1 free G3P molecular dough packet!</p>
+                                    
+                                    <!-- Inventory list -->
+                                    <div class="space-y-2.5 font-mono text-sm text-slate-700 bg-white p-4 rounded-lg border border-slate-200">
+                                        <div class="flex justify-between border-b pb-2">
+                                            <span>CO2 Atmospheric Ingest:</span>
+                                            <span class="font-bold text-red-600" id="inv-co2">0 / 3</span>
+                                        </div>
+                                        <div class="flex justify-between border-b pb-2">
+                                            <span>Chemical Fuel Charged:</span>
+                                            <span class="font-bold text-blue-600" id="inv-fuel">No</span>
+                                        </div>
+                                        <div class="flex justify-between border-b pb-2">
+                                            <span>RuBP Carrier Regenerated:</span>
+                                            <span class="font-bold text-purple-600" id="inv-rubp">No</span>
+                                        </div>
+                                        <div class="flex justify-between pt-2 font-bold text-emerald-800">
+                                            <span>G3P Harvested Dough:</span>
+                                            <span id="inv-g3p" class="animate-pulse">0 Packs</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-amber-950 p-4 rounded-xl border border-amber-800 mt-6">
+                                    <span class="text-xs uppercase tracking-wider font-extrabold text-amber-400 font-mono">Scientific Carbon Math Check:</span>
+                                    <p class="text-xs md:text-sm text-amber-200 mt-1.5 font-serif italic leading-relaxed">
+                                        "Remember: Rubisco is highly inefficient. We need 3 full molecules of CO2 to successfully generate and release just 1 single G3P carbohydrate output!"
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Adaptations C3, C4, CAM -->
+                <div id="tab-adaptations" class="tab-panel hidden flex flex-col gap-6 max-w-5xl mx-auto">
+                    <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">Module 5: Evolutionary Adaptations</h2>
+                        <p class="text-base text-slate-500">Compare how different ecological niches evolved divergent biochemical pathways to solve the Water vs. Carbon dilemma.</p>
+
+                        <!-- Card Comparison Layout -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                            <!-- C3 Plants -->
+                            <div class="bg-white border border-slate-200 hover:border-slate-300 transition-colors rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                                        <h3 class="text-lg font-bold text-slate-800">C3 Plants</h3>
+                                    </div>
+                                    <span class="inline-block text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md mb-3">Standard Strategy</span>
+                                    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                                        No structural or temporal modifications. Performs both carbon fixation and the Calvin cycle in the same mesophyll cell at the exact same time.
+                                    </p>
+                                    <div class="text-xs md:text-sm space-y-1 bg-slate-50 p-3 rounded-lg border text-slate-600 leading-relaxed">
+                                        <strong>Vulnerable Environment:</strong> Hot, dry climates where closing stomata triggers photorespiration.
+                                    </div>
+                                </div>
+                                <div class="mt-4 border-t pt-3 text-xs text-slate-400 font-mono italic">
+                                    Examples: Rice, Wheat, Soybean trees.
+                                </div>
+                            </div>
+
+                            <!-- C4 Plants -->
+                            <div class="bg-white border border-amber-200 hover:border-amber-300 transition-colors rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                        <h3 class="text-lg font-bold text-amber-800">C4 Plants</h3>
+                                    </div>
+                                    <span class="inline-block text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md mb-3">Spatial Separation</span>
+                                    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                                        Separates functions physically. Captures carbon in external mesophyll cells using PEP Carboxylase, then pumps carbon deep into bundle-sheath cells away from high oxygen levels.
+                                    </p>
+                                    <div class="text-xs md:text-sm space-y-1 bg-amber-50/40 p-3 rounded-lg border border-amber-100 text-amber-800 leading-relaxed">
+                                        <strong>Adaptive Environment:</strong> Bright, hot fields where water loss is a high risk.
+                                    </div>
+                                </div>
+                                <div class="mt-4 border-t pt-3 text-xs text-slate-400 font-mono italic">
+                                    Examples: Corn, Sugarcane, Crabgrass.
+                                </div>
+                            </div>
+
+                            <!-- CAM Plants -->
+                            <div class="bg-white border border-indigo-200 hover:border-indigo-300 transition-colors rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                        <h3 class="text-lg font-bold text-indigo-800">CAM Plants</h3>
+                                    </div>
+                                    <span class="inline-block text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md mb-3">Temporal Separation</span>
+                                    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                                        Separates carbon processes by time. Opens stomata *only* in the cool night to trap CO2 safely, then processes carbohydrates via the Calvin cycle during the daytime.
+                                    </p>
+                                    <div class="text-xs md:text-sm space-y-1 bg-indigo-50/40 p-3 rounded-lg border border-indigo-100 text-indigo-800 leading-relaxed">
+                                        <strong>Adaptive Environment:</strong> Arid deserts with extreme high daytime heat.
+                                    </div>
+                                </div>
+                                <div class="mt-4 border-t pt-3 text-xs text-slate-400 font-mono italic">
+                                    Examples: Pineapples, Cacti, Agave.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Virtual Leaf Disk Lab (Interactive Simulation) -->
+                <div id="tab-lab" class="tab-panel hidden flex flex-col gap-6 max-w-5xl mx-auto">
+                    <div class="bg-indigo-900 p-6 md:p-8 rounded-2xl border-b-4 border-indigo-700 shadow-lg text-white">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4 border-b border-indigo-800 pb-4">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-amber-400 text-indigo-900 text-xs font-extrabold px-2.5 py-1 rounded uppercase tracking-wider shadow-sm">Virtual Lab Mode</span>
+                                    <h2 class="text-2xl font-bold">Floating Leaf Disk Assay</h2>
+                                </div>
+                                <p class="text-sm md:text-base text-indigo-200 mt-1">Vary carbon dioxide concentration, light color, and light intensity. See how rates of O2 bubble generation affect density.</p>
+                            </div>
+                            
+                            <!-- Lab Buttons Control Grid -->
+                            <div class="flex gap-2 self-start lg:self-auto">
+                                <button onclick="runLabSimulation()" id="btn-start-lab" class="bg-amber-400 hover:bg-amber-500 text-indigo-950 text-sm font-bold px-5 py-2.5 rounded-lg shadow-md transition-transform active:scale-95 flex items-center gap-1.5">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+                                    <span>Run Assay</span>
+                                </button>
+                                <button onclick="resetLabSimulation()" id="btn-reset-lab" class="bg-indigo-800 hover:bg-indigo-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg border border-indigo-600 shadow-md transition-transform active:scale-95 flex items-center gap-1.5">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2M7 9a1 1 0 11-2 0V5H3"/></svg>
+                                    <span>Reset Setup</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+                            <!-- Left Sidebar: Independent variables controls -->
+                            <div class="lg:col-span-4 bg-indigo-950/60 border border-indigo-800/80 rounded-xl p-5 flex flex-col gap-4">
+                                <h3 class="text-xs uppercase font-extrabold tracking-wider text-amber-300 border-b border-indigo-800 pb-2">Independent Variables</h3>
+                                
+                                <!-- Variable 1: Carbon Source (Sodium Bicarbonate) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-indigo-200 mb-1.5" for="var-bicarbonate">
+                                        Carbon Source (Bicarbonate Conc.)
+                                    </label>
+                                    <select id="var-bicarbonate" class="w-full text-sm rounded-lg border border-indigo-700 bg-indigo-900 p-2.5 text-white focus:outline-none focus:ring-1 focus:ring-amber-400">
+                                        <option value="0">0% (Distilled Water)</option>
+                                        <option value="0.5" selected>0.5% Solution</option>
+                                        <option value="1.5">1.5% Solution (Optimal)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Variable 2: Light Intensity -->
+                                <div>
+                                    <label class="block text-xs font-bold text-indigo-200 mb-1.5" for="var-light-level">
+                                        Light Intensity
+                                    </label>
+                                    <select id="var-light-level" class="w-full text-sm rounded-lg border border-indigo-700 bg-indigo-900 p-2.5 text-white focus:outline-none focus:ring-1 focus:ring-amber-400">
+                                        <option value="0">0% (Darkness)</option>
+                                        <option value="30">30% (Low Light)</option>
+                                        <option value="70" selected>70% (Medium Light)</option>
+                                        <option value="100">100% (High Light)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Variable 3: Wavelength (Color) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-indigo-200 mb-1.5" for="var-light-color">
+                                        Light Spectrum (Color Filter)
+                                    </label>
+                                    <select id="var-light-color" class="w-full text-sm rounded-lg border border-indigo-700 bg-indigo-900 p-2.5 text-white focus:outline-none focus:ring-1 focus:ring-amber-400">
+                                        <option value="white" selected>White (Full Spectrum)</option>
+                                        <option value="blue">Blue Light Filter</option>
+                                        <option value="red">Red Light Filter</option>
+                                        <option value="green">Green Light Filter</option>
+                                    </select>
+                                </div>
+
+                                <!-- Professor Advice Tooltip Box -->
+                                <div class="bg-indigo-900/80 text-indigo-200 p-4 rounded-lg mt-2 border border-indigo-800">
+                                    <h4 class="text-xs font-bold text-amber-300 tracking-wider uppercase font-mono">Dr. Gopalakrishnan's Tip:</h4>
+                                    <p class="text-xs mt-1.5 leading-relaxed">
+                                        "Distilled water contains no bicarbonate ions, meaning the dark reactions have no carbon source to run. Watch what happens to the spinach disks when you run the experiment without CO2!"
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Middle Compartment: Live Beaker Animation Area (Indigo/Amber Color Palette redesign) -->
+                            <div class="lg:col-span-5 bg-white border-2 border-indigo-200 rounded-xl p-5 flex flex-col items-center justify-between relative shadow-inner min-h-[380px]">
+                                <div class="absolute top-4 left-4 z-10">
+                                    <span class="bg-indigo-100 text-indigo-800 text-xs font-mono font-bold px-2.5 py-1 rounded-full border border-indigo-200 uppercase tracking-wider">
+                                        Beaker Setup
+                                    </span>
+                                </div>
+
+                                <!-- Beaker Fluid Rendering Container -->
+                                <div class="w-full max-w-[240px] h-[250px] border-x-4 border-b-4 border-indigo-300 rounded-b-3xl relative mt-12 bg-indigo-50/10 overflow-hidden flex flex-col justify-end">
+                                    <!-- Fluid Water fill representation (Vibrant Indigo Fluid) -->
+                                    <div class="absolute inset-x-0 bottom-0 top-6 bg-indigo-500/20 border-t-2 border-indigo-400/40 transition-all duration-300 z-0"></div>
+                                    
+                                    <!-- Floating Leaf Disk Container -->
+                                    <div class="w-full h-full relative z-10" id="beaker-disks-container">
+                                        <!-- Leaf discs are dynamically generated here -->
+                                    </div>
+                                </div>
+
+                                <!-- Live Readout of float metrics -->
+                                <div class="w-full flex justify-between bg-indigo-950 border border-indigo-800 rounded p-2.5 text-sm font-mono mt-4">
+                                    <span class="text-indigo-200">Time Elapsed: <span id="lab-timer-val" class="text-amber-400 font-bold">0s</span></span>
+                                    <span class="text-indigo-200">Floating Disks: <span id="lab-floating-val" class="text-amber-400 font-bold">0 / 10</span></span>
+                                </div>
+                            </div>
+
+                            <!-- Right Compartment: Interactive Chart / Data Logger -->
+                            <div class="lg:col-span-3 bg-indigo-950/60 border border-indigo-800/80 rounded-xl p-5 flex flex-col justify-between">
+                                <h3 class="text-xs uppercase font-extrabold tracking-wider text-amber-300 border-b border-indigo-800 pb-2 mb-3">Live Log</h3>
+                                
+                                <div class="flex-1 bg-indigo-950 p-4 rounded-lg border border-indigo-800 overflow-y-auto text-xs font-mono leading-relaxed space-y-2 max-h-[220px] custom-scrollbar text-amber-200" id="lab-log-console">
+                                    <div class="text-indigo-400">&gt; Waiting for simulation to begin...</div>
+                                </div>
+                                
+                                <div class="mt-4 pt-3 border-t border-indigo-800">
+                                    <div class="text-[11px] text-indigo-300 leading-relaxed italic">
+                                        Note: Rates of photosynthesis are calculated based on the T50 point (the time it takes for 50% of the leaf disks to float).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Interactive Exam Suite -->
+                <div id="tab-quiz" class="tab-panel hidden flex flex-col gap-6 max-w-4xl mx-auto">
+                    <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b pb-4">
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800">Module 8: Interactive Exam Suite</h2>
+                                <p class="text-base text-slate-500">Test your mastery of light wavelengths, the Calvin cycle, and metabolic adaptations.</p>
+                            </div>
+                            <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full border border-emerald-300">10 Questions</span>
+                        </div>
+
+                        <!-- Quiz Layout -->
+                        <form id="quiz-form" onsubmit="gradeQuiz(event)">
+                            <div class="space-y-6" id="quiz-questions-container">
+                                <!-- Question templates will render dynamically below via JS -->
+                            </div>
+
+                            <!-- Submit Quiz action bar -->
+                            <div class="border-t border-slate-200 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <span class="text-sm text-slate-500">Please answer all questions before submitting your final attempt.</span>
+                                <div class="flex gap-2">
+                                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm px-6 py-3.5 rounded-lg shadow-md active:scale-95 transition-transform">
+                                        Submit Final Score Check
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Score Breakdown Container (Initially Hidden) -->
+                        <div id="quiz-results" class="hidden mt-8 bg-slate-50 border border-slate-200 rounded-xl p-6">
+                            <div class="flex flex-col sm:flex-row items-center gap-6 justify-between border-b pb-4 mb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-slate-800">Assessment Breakdown</h3>
+                                    <p class="text-sm text-slate-500 mt-1">Review your correct pathways and complete professor rationales.</p>
+                                </div>
+                                <div class="text-center">
+                                    <span class="text-xs uppercase font-bold text-slate-400">Total Score</span>
+                                    <div class="text-3xl font-extrabold text-emerald-600" id="results-score-badge">0 / 10</div>
+                                </div>
+                            </div>
+                            <!-- Success statement / feedback text -->
+                            <div class="bg-white p-5 rounded-lg border text-sm leading-relaxed font-serif italic text-slate-600" id="results-comment">
+                                <!-- Comment content generated on grade -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Active JS Logic Layer -->
+    <script>
+        // Tab State Architecture
+        const tabs = ['tab-welcome', 'tab-autotroph', 'tab-chloroplast', 'tab-light', 'tab-calvin', 'tab-adaptations', 'tab-lab', 'tab-quiz'];
+        
+        function switchTab(targetTabId) {
+            tabs.forEach(tabId => {
+                const element = document.getElementById(tabId);
+                const button = document.getElementById(`btn-${tabId}`);
+                const selectElement = document.getElementById('mobile-nav');
+                
+                if (tabId === targetTabId) {
+                    element.classList.remove('hidden');
+                    if (button) button.classList.add('active', 'bg-emerald-800', 'text-white');
+                    if (button) button.classList.remove('text-slate-300');
+                    if (selectElement) selectElement.value = targetTabId;
+                } else {
+                    element.classList.add('hidden');
+                    if (button) button.classList.remove('active', 'bg-emerald-800', 'text-white');
+                    if (button) button.classList.add('text-slate-300');
+                }
+            });
+        }
+
+        // Module 2: Chloroplast Parts Explorer
+        const chloroplastMetadata = {
+            outer: {
+                title: "Outer Membrane",
+                name: "Outer Permeability Barrier",
+                desc: "The outermost outer membrane is highly permeable to small molecules and ions due to specialized trans-membrane channel proteins called porins.",
+                note: "Why double membranes? This ancestral hallmark points directly to Endosymbiotic Theory—the evolutionary event where an ancient host cell engulfed a photosynthetic cyanobacterium!"
+            },
+            inner: {
+                title: "Inner Membrane",
+                name: "Selective Permeability Boundary",
+                desc: "Unlike the outer, the inner chloroplast membrane is highly selective and controls what metabolites pass between the cytoplasm and the internal stroma matrix.",
+                note: "Transporter proteins here selectively pump carbon compounds and structural elements to keep the interior factory working at prime efficiency."
+            },
+            stroma: {
+                title: "Stroma Fluid Matrix",
+                name: "The Sugar Kitchen Assembly Line",
+                desc: "A thick, alkaline fluid rich in organic enzymes, ribosomes, and DNA. The stroma is the exact structural site of the Light-Independent Reactions (the Calvin Cycle).",
+                note: "It is in the stroma where the plant fixes carbon into physical sugars. This is where Rubisco meets gaseous carbon dioxide."
+            },
+            granum: {
+                title: "Granum Stack",
+                name: "Concentrated Solar Arrays",
+                desc: "Grana are stacks of disk-like thylakoid membranes piled together like green pancakes. This stack architecture maximizes physical space efficiency.",
+                note: "By stacking these structures, plants can packing millions of pigment compounds into tiny areas, increasing their ability to harvest ambient light energy."
+            },
+            thylakoid: {
+                title: "Thylakoid Membrane",
+                name: "The Light Reactions Power Grid",
+                desc: "A continuous membrane network embedded with critical biochemical complexes: Photosystem I and II, the Electron Transport Chains, and ATP Synthase.",
+                note: "This membrane acts as a physical barrier designed to hold an electrochemical gradient of hydrogen ions, which acts as a dam waiting to power ATP production."
+            },
+            lumen: {
+                title: "Thylakoid Lumen",
+                name: "The Proton Reservoir Space",
+                desc: "The narrow, internal aqueous fluid space inside a thylakoid sac. As electrons are passed down the ETC, protons (H+) are pumped directly here, creating extreme high pressure.",
+                note: "This proton reservoir is highly acidic due to the massive buildup of H+ ions waiting to rush through the rotating rotor of ATP Synthase."
+            }
+        };
+
+        function showChloroplastPart(partKey) {
+            const data = chloroplastMetadata[partKey];
+            if (!data) return;
+
+            document.getElementById('chloro-title').innerText = data.title;
+            document.getElementById('chloro-name').innerText = data.name;
+            document.getElementById('chloro-desc').innerHTML = data.desc;
+            document.getElementById('chloro-note').innerHTML = `"${data.note}"`;
+        }
+
+        // Module 3: Light-Dependent Reactions Simulator
+        let currentLightPathway = 'linear';
+        function setLightPath(path) {
+            currentLightPathway = path;
+            const btnLinear = document.getElementById('btn-path-linear');
+            const btnDynamic = document.getElementById('btn-path-cyclic');
+            const indicator = document.getElementById('pathway-indicator');
+            const desc = document.getElementById('pathway-desc');
+
+            const ps2Card = document.getElementById('ps2-card');
+            const ps2Sublabel = document.getElementById('ps2-sublabel');
+            const ps2Status = document.getElementById('ps2-status');
+            const etcCard = document.getElementById('etc-card');
+            const nadphBadge = document.getElementById('nadph-badge');
+
+            if (path === 'linear') {
+                btnLinear.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
+                btnLinear.classList.remove('text-slate-300');
+                btnDynamic.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
+                btnDynamic.classList.add('text-slate-400');
+
+                indicator.innerText = "Linear Pathway Active";
+                indicator.className = "bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold px-2.5 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider";
+                
+                desc.innerHTML = "<strong>Linear Pathway:</strong> Standard one-way pipeline. Electrons originate from water splitting (photolysis), pass down the ETC to Photosystem I, and are loaded onto NADP+ to form NADPH.";
+
+                // Show PSII and Linear metrics
+                ps2Card.style.opacity = "1";
+                ps2Sublabel.style.display = "block";
+                ps2Status.innerText = "Active";
+                nadphBadge.style.opacity = "1";
+            } else {
+                btnDynamic.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
+                btnDynamic.classList.remove('text-slate-300');
+                btnLinear.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
+                btnLinear.classList.add('text-slate-400');
+
+                indicator.innerText = "Cyclic Pathway Active";
+                indicator.className = "bg-purple-500/20 text-purple-300 text-xs font-mono font-bold px-2.5 py-1 rounded-full border border-purple-500/30 uppercase tracking-wider";
+
+                desc.innerHTML = "<strong>Cyclic Pathway:</strong> Electrons are continually recycled around Photosystem I. No water is split (no O2 produced), and no NADPH is generated. Protons are still pumped through the ETC to generate extra ATP.";
+
+                // Dim/Disable PSII and Linear components
+                ps2Card.style.opacity = "0.3";
+                ps2Sublabel.style.display = "none";
+                ps2Status.innerText = "Bypassed";
+                nadphBadge.style.opacity = "0.2";
+            }
+        }
+
+        // Module 4: Calvin Cycle Kitchen Interactive
+        let calvinState = {
+            co2Count: 0,
+            hasFuel: false,
+            hasRubp: false,
+            g3pHarvested: 0
+        };
+
+        function updateBakeryUI() {
+            document.getElementById('inv-co2').innerText = `${calvinState.co2Count} / 3`;
+            document.getElementById('inv-fuel').innerText = calvinState.hasFuel ? "Charged (Yes)" : "No";
+            document.getElementById('inv-fuel').className = calvinState.hasFuel ? "font-bold text-emerald-600" : "font-bold text-red-600";
+            document.getElementById('inv-rubp').innerText = calvinState.hasRubp ? "Regenerated (Yes)" : "No";
+            document.getElementById('inv-rubp').className = calvinState.hasRubp ? "font-bold text-emerald-600" : "font-bold text-red-600";
+            document.getElementById('inv-g3p').innerText = `${calvinState.g3pHarvested} Pack${calvinState.g3pHarvested !== 1 ? 's' : ''}`;
+
+            const p1Card = document.getElementById('p1-card');
+            const p2Card = document.getElementById('p2-card');
+            const p3Card = document.getElementById('p3-card');
+
+            const btn1 = document.getElementById('btn-bakery-1');
+            const btn2 = document.getElementById('btn-bakery-2');
+            const btn3 = document.getElementById('btn-bakery-3');
+
+            const status1 = document.getElementById('bakery-step-status-1');
+            const status2 = document.getElementById('bakery-step-status-2');
+            const status3 = document.getElementById('bakery-step-status-3');
+
+            // Handle Flow Locks
+            if (calvinState.co2Count < 3) {
+                p1Card.classList.remove('opacity-50');
+                p2Card.classList.add('opacity-50');
+                p3Card.classList.add('opacity-50');
+
+                btn1.disabled = false;
+                btn2.disabled = true;
+                btn3.disabled = true;
+
+                status1.innerText = "Needs CO2 input...";
+                status2.innerText = "Locked";
+                status3.innerText = "Locked";
+            } else if (!calvinState.hasFuel) {
+                p1Card.classList.add('opacity-50');
+                p2Card.classList.remove('opacity-50');
+                p3Card.classList.add('opacity-50');
+
+                btn1.disabled = true;
+                btn2.disabled = false;
+                btn3.disabled = true;
+
+                status1.innerText = "Complete ✓";
+                status2.innerText = "Ready to fuel...";
+                status3.innerText = "Locked";
+            } else if (!calvinState.hasRubp) {
+                p1Card.classList.add('opacity-50');
+                p2Card.classList.add('opacity-50');
+                p3Card.classList.remove('opacity-50');
+
+                btn1.disabled = true;
+                btn2.disabled = true;
+                btn3.disabled = false;
+
+                status1.innerText = "Complete ✓";
+                status2.innerText = "Complete ✓";
+                status3.innerText = "Ready to regenerate...";
+            }
+        }
+
+        function runBakeryStep(phase) {
+            if (phase === 1) {
+                if (calvinState.co2Count < 3) {
+                    calvinState.co2Count++;
+                    if (calvinState.co2Count === 3) {
+                        // Alert-free status check
+                        logConsole(`[Calvin Kitchen]: Rubisco has locked 3 CO2 molecules to RuBP sugar carriers.`);
+                    }
+                }
+            } else if (phase === 2) {
+                if (calvinState.co2Count === 3 && !calvinState.hasFuel) {
+                    calvinState.hasFuel = true;
+                    calvinState.g3pHarvested++;
+                    logConsole(`[Calvin Kitchen]: ATP and NADPH energy used! 1 G3P harvested as sweet carbohydrate dough!`);
+                }
+            } else if (phase === 3) {
+                if (calvinState.hasFuel && !calvinState.hasRubp) {
+                    calvinState.hasRubp = true;
+                    logConsole(`[Calvin Kitchen]: Final ATP applied. RuBP regenerated successfully. Ready for next recipe run!`);
+                    // Reset cycle parameters
+                    setTimeout(() => {
+                        calvinState.co2Count = 0;
+                        calvinState.hasFuel = false;
+                        calvinState.hasRubp = false;
+                        updateBakeryUI();
+                    }, 1200);
+                }
+            }
+            updateBakeryUI();
+        }
+
+        function resetBakery() {
+            calvinState = { co2Count: 0, hasFuel: false, hasRubp: false, g3pHarvested: 0 };
+            updateBakeryUI();
+            logConsole(`[Calvin Kitchen]: Production lines reset by professor request.`);
+        }
+
+        // Virtual Leaf Disk Assay Simulation Framework
+        let labTimer = 0;
+        let labInterval = null;
+        let labDisks = []; // Array of disk objects: { id, y, floatTime, isFloating, bubblesCount }
+
+        function logConsole(message) {
+            const consoleEl = document.getElementById('lab-log-console');
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            consoleEl.innerHTML += `<div class="border-b border-indigo-900/40 py-1"><span class="text-amber-400 font-bold">[${timeStr}]</span> ${message}</div>`;
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Indigo and Amber Redesigned rendering
+        function renderDisks() {
+            const container = document.getElementById('beaker-disks-container');
+            container.innerHTML = '';
+            
+            labDisks.forEach((disk, idx) => {
+                const diskDiv = document.createElement('div');
+                diskDiv.className = 'absolute w-6 h-6 rounded-full border transition-all duration-[1000ms] ease-out shadow-md flex items-center justify-center';
+                
+                // Styling based on float progress - vibrant Amber highlight
+                if (disk.isFloating) {
+                    diskDiv.classList.add('bg-amber-400', 'border-amber-600');
+                    // Add glowing oxygen bubbles
+                    diskDiv.innerHTML = `
+                        <div class="absolute -top-1.5 -left-1.5 w-2 h-2 bg-indigo-100 rounded-full animate-ping"></div>
+                        <div class="absolute -bottom-1 -right-1 w-1.5 h-1.5 bg-indigo-200 rounded-full"></div>
+                    `;
+                    diskDiv.style.bottom = `${200 - (idx * 4)}px`; // stack slightly at top
+                } else {
+                    diskDiv.classList.add('bg-amber-600', 'border-amber-800');
+                    diskDiv.style.bottom = '10px';
+                }
+                
+                // stagger horizontal distribution randomly across width
+                const horizontalOffset = 15 + (idx * 18);
+                diskDiv.style.left = `${horizontalOffset}px`;
+                container.appendChild(diskDiv);
+            });
+        }
+
+        function generateDisksSetup() {
+            labDisks = [];
+            for (let i = 0; i < 10; i++) {
+                labDisks.push({
+                    id: i,
+                    isFloating: false,
+                    floatTime: null,
+                    bubblesCount: 0
+                });
+            }
+            renderDisks();
+        }
+
+        function calculatePhotosynthesisRates() {
+            const bicarbonate = parseFloat(document.getElementById('var-bicarbonate').value);
+            const light = parseInt(document.getElementById('var-light-level').value);
+            const wavelength = document.getElementById('var-light-color').value;
+
+            logConsole(`[Variable Check]: Bicarbonate Conc. = ${bicarbonate}%, Light Level = ${light}%, Spectrum = ${wavelength}`);
+
+            // Base rate parameters (slower is higher floatTime)
+            if (light === 0) {
+                logConsole(`[System alert]: Light source is turned OFF. Photosynthesis cannot initiate.`);
+                return null; // darkness = never float
+            }
+            if (bicarbonate === 0) {
+                logConsole(`[System alert]: No Carbon Dioxide Source present. Calvin cycle cannot run.`);
+                return null; // no bicarbonate = never float
+            }
+
+            // Calculation multipliers
+            let wavelengthMult = 1.0;
+            if (wavelength === 'green') {
+                wavelengthMult = 5.0; // very slow!
+                logConsole(`[Biological note]: Green filter applied. Chlorophyll reflects green wavelengths, yielding low energy.`);
+            } else if (wavelength === 'white') {
+                wavelengthMult = 1.0;
+            } else if (wavelength === 'blue' || wavelength === 'red') {
+                wavelengthMult = 0.8; // highly effective
+                logConsole(`[Biological note]: Blue/Red spectrum matches chlorophyll absorption peak beautifully.`);
+            }
+
+            let lightMult = 1.0;
+            if (light === 30) lightMult = 2.0; // low light = slow
+            if (light === 70) lightMult = 1.2;
+            if (light === 100) lightMult = 0.8; // high light = fast
+
+            let bicMult = 1.0;
+            if (bicarbonate === 0.5) bicMult = 1.2;
+            if (bicarbonate === 1.5) bicMult = 0.8; // optimal concentration
+
+            // Assign individual float times with slight random variance
+            labDisks.forEach((disk) => {
+                const baseTime = 12; // base seconds to float
+                const variance = Math.random() * 5 - 2; // +/- 2 seconds variance
+                disk.floatTime = Math.max(3, (baseTime * wavelengthMult * lightMult * bicMult) + variance);
+            });
+
+            return true;
+        }
+
+        function runLabSimulation() {
+            if (labInterval) clearInterval(labInterval);
+            resetLabSimulation();
+
+            logConsole(`[Starting Assay]: Setting up vacuum-infiltrated leaf disks.`);
+            const runnable = calculatePhotosynthesisRates();
+            
+            document.getElementById('btn-start-lab').disabled = true;
+
+            labInterval = setInterval(() => {
+                labTimer++;
+                document.getElementById('lab-timer-val').innerText = `${labTimer}s`;
+
+                // If no conditions met, just let clock run forever (disks stay sunken)
+                if (runnable) {
+                    let floatCount = 0;
+                    labDisks.forEach(disk => {
+                        if (!disk.isFloating && labTimer >= disk.floatTime) {
+                            disk.isFloating = true;
+                            logConsole(`[Float Log]: Leaf Disk #${disk.id + 1} has floated to surface at ${labTimer}s.`);
+                        }
+                        if (disk.isFloating) floatCount++;
+                    });
+
+                    document.getElementById('lab-floating-val').innerText = `${floatCount} / 10`;
+                    renderDisks();
+
+                    if (floatCount === 10) {
+                        clearInterval(labInterval);
+                        logConsole(`[Experiment Complete]: All disks floated! T50 (Time for 50% float) was roughly ${Math.round(labTimer / 2)}s.`);
+                        document.getElementById('btn-start-lab').disabled = false;
+                    }
+                }
+            }, 1000);
+        }
+
+        function resetLabSimulation() {
+            if (labInterval) clearInterval(labInterval);
+            labTimer = 0;
+            document.getElementById('lab-timer-val').innerText = '0s';
+            document.getElementById('lab-floating-val').innerText = '0 / 10';
+            document.getElementById('btn-start-lab').disabled = false;
+            generateDisksSetup();
+        }
+
+        // Rigorous Exam Suite Generation - Updated to exactly 10 high-quality, OpenStax 2e Chapter 8 matching questions
+        const examQuestions = [
+            {
+                id: 1,
+                question: "Which of the following correct pathways represents the flow of electrons during standard, non-cyclic (linear) photophosphorylation?",
+                options: [
+                    "H2O &rarr; Photosystem I &rarr; ETC &rarr; Photosystem II &rarr; NADP+",
+                    "H2O &rarr; Photosystem II &rarr; ETC &rarr; Photosystem I &rarr; NADP+",
+                    "NADPH &rarr; Calvin Cycle &rarr; Photosystem II &rarr; ETC &rarr; Photosystem I",
+                    "CO2 &rarr; Photosystem II &rarr; Photosystem I &rarr; ETC &rarr; NADPH"
+                ],
+                answer: 1,
+                rationale: "Standard non-cyclic photophosphorylation moves in a linear sequence. Water splits first to supply electrons directly to the reaction center of Photosystem II (P680), which then travels down the ETC to Photosystem I (P700) and terminates on NADP+ to form NADPH."
+            },
+            {
+                id: 2,
+                question: "A targeted agricultural herbicide selectively blocks the enzyme NADP+ Reductase. If applied, which of the following processes will continue to run for a short period?",
+                options: [
+                    "Carbon fixation in the Calvin cycle",
+                    "Splitting of water molecules at Photosystem II",
+                    "Cyclic photophosphorylation and ATP generation",
+                    "Reduction of 3-PGA to G3P"
+                ],
+                answer: 2,
+                rationale: "When NADP+ Reductase is blocked, linear electron flow stops because there is no terminal receiver. However, Photosystem I can continue to run Cyclic electron flow safely, routing electrons back through the ETC to continue pumping protons and producing ATP."
+            },
+            {
+                id: 3,
+                question: "During the light reactions, the energy released as electrons pass down the first Electron Transport Chain is directly harvested to perform which mechanical task?",
+                options: [
+                    "Phosphorylate ADP into ATP",
+                    "Bind Carbon Dioxide to RuBP",
+                    "Pump hydrogen ions (H+) from the stroma into the thylakoid lumen",
+                    "Pump hydrogen ions (H+) from the thylakoid lumen out into the stroma"
+                ],
+                answer: 2,
+                rationale: "The kinetic energy released by electrons during transport is specifically harvested by membrane pumps to move hydrogen ions (H+) against their gradient from the stroma *into* the thylakoid lumen. ATP Synthase, not the ETC directly, carries them back out."
+            },
+            {
+                id: 4,
+                question: "In a laboratory experiment, a plant is grown where all water (H2O) contains a heavy isotope of oxygen (18O). The carbon dioxide contains normal oxygen (16O). Which product of photosynthesis will contain the 18O?",
+                options: [
+                    "The gaseous oxygen (O2) released by the plant",
+                    "The glucose (C6H12O6) stored in the plant roots",
+                    "The RuBP molecule regenerated in the Calvin cycle",
+                    "The water vapor transpired by the leaves"
+                ],
+                answer: 0,
+                rationale: "All gaseous oxygen (O2) released during photosynthesis originates directly from the photolysis (water splitting) reaction inside Photosystem II, rather than from carbon dioxide."
+            },
+            {
+                id: 5,
+                question: "Why does the Calvin Cycle require cyclic photophosphorylation to run periodically?",
+                options: [
+                    "Linear flow produces equal parts ATP and NADPH, but the Calvin cycle consumes more NADPH than ATP.",
+                    "Linear flow produces equal parts ATP and NADPH, but the Calvin cycle consumes more ATP than NADPH.",
+                    "Cyclic photophosphorylation is the only pathway that can fix carbon under low-light desert conditions.",
+                    "Cyclic flow provides the oxygen necessary to catalyze Rubisco during Phase 1."
+                ],
+                answer: 1,
+                rationale: "The synthesis of one G3P molecule in the Calvin Cycle requires 9 ATP but only 6 NADPH (a 3:2 ratio). Because linear electron flow produces them in roughly equal amounts, cyclic flow balances this shortfall by producing ATP only."
+            },
+            {
+                id: 6,
+                question: "In C4 and CAM plants, PEP Carboxylase is used to initially fix carbon instead of Rubisco. What specific evolutionary advantage does PEP Carboxylase offer?",
+                options: [
+                    "It uses significantly less ATP to bind carbon dioxide than Rubisco.",
+                    "It has zero affinity for oxygen (O2), preventing the wasteful process of photorespiration.",
+                    "It converts carbon dioxide directly into glucose without needing any light energy.",
+                    "It can operate successfully without requiring any intracellular water."
+                ],
+                answer: 1,
+                rationale: "Rubisco has a fatal flaw—its active site easily binds oxygen instead of CO2 when temperatures rise (photorespiration). PEP Carboxylase only binds CO2 and ignores oxygen completely, preventing energy waste."
+            },
+            {
+                id: 7,
+                question: "Which of the following options correctly maps the separation strategies to their respective plant groups?",
+                options: [
+                    "C4 plants use temporal separation; CAM plants use spatial separation.",
+                    "C3 plants use spatial separation; C4 plants use temporal separation.",
+                    "C4 plants use spatial separation; CAM plants use temporal separation.",
+                    "C3, C4, and CAM plants all use spatial separation, but differ in temporal cycles."
+                ],
+                answer: 2,
+                rationale: "C4 plants physically isolate carbon capture (mesophyll cells) from the Calvin Cycle (bundle-sheath cells) in space. CAM plants perform carbon capture at night and run the Calvin cycle during the day (temporal separation)."
+            },
+            {
+                id: 8,
+                question: "During active photosynthesis, what is the chemical state of the thylakoid lumen compared to the stroma?",
+                options: [
+                    "The thylakoid lumen becomes highly acidic (low pH) compared to the alkaline stroma.",
+                    "The thylakoid lumen becomes highly basic (high pH) compared to the acidic stroma.",
+                    "Both compartments maintain a strictly neutral pH of 7.0 via rapid diffusion.",
+                    "The stroma becomes highly concentrated with positively charged oxygen atoms."
+                ],
+                answer: 0,
+                rationale: "Proton pumping by the ETC cytochrome complex, combined with the release of H+ ions from water-splitting, results in an intense accumulation of H+ ions inside the thylakoid lumen. This makes the lumen highly acidic (low pH) compared to the alkaline stroma."
+            },
+            {
+                id: 9,
+                question: "For a plant to synthesize one single, stable hexose molecule of Glucose (C6H12O6), what are the total required inputs of G3P, ATP, and NADPH?",
+                options: [
+                    "1 G3P molecule, 9 ATP, and 6 NADPH",
+                    "2 G3P molecules, 18 ATP, and 12 NADPH",
+                    "3 G3P molecules, 27 ATP, and 18 NADPH",
+                    "6 G3P molecules, 54 ATP, and 36 NADPH"
+                ],
+                answer: 1,
+                rationale: "One net G3P molecule (a 3-carbon sugar) is produced by fixing 3 molecules of CO2, consuming 9 ATP and 6 NADPH. Since glucose is a 6-carbon hexose sugar, it requires exactly 2 G3P molecules to build, representing 6 total turns of the cycle, consuming 18 ATP and 12 NADPH."
+            },
+            {
+                id: 10,
+                question: "From an evolutionary standpoint, what critical benefit did the development of dual photosystems (PS II and PS I working together) provide to ancient photoautotrophs?",
+                options: [
+                    "It allowed them to switch off organic respiration entirely.",
+                    "It enabled them to use highly abundant water (H2O) as an electron donor, releasing oxygen as a byproduct.",
+                    "It eliminated the requirement for any enzymatic catalysts like Rubisco.",
+                    "It allowed solar energy to be converted directly into high-energy proteins instead of carbohydrates."
+                ],
+                answer: 1,
+                rationale: "Earlier photosynthetic bacteria used electron donors like hydrogen sulfide (H2S), which are limited in availability. The evolution of coupled photosystems generated enough energy to split water (H2O)—an incredibly abundant resource—liberating oxygen and fueling the rise of aerobic life."
+            }
+        ];
+
+        function renderExamQuestions() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+
+            examQuestions.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 border border-slate-200 p-5 rounded-xl flex flex-col gap-3 transition-colors';
+                card.id = `q-card-${q.id}`;
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <span class="bg-slate-200 text-slate-800 font-mono text-sm px-2.5 py-1 rounded-md font-bold mt-0.5 font-sans">Q${idx + 1}</span>
+                        <h3 class="text-base font-bold text-slate-800 leading-relaxed">${q.question}</h3>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2 mt-2">
+                        ${q.options.map((opt, oIdx) => `
+                            <label class="flex items-center gap-3 bg-white hover:bg-slate-100 transition-colors border border-slate-200 rounded-lg p-3 text-sm cursor-pointer">
+                                <input type="radio" name="question-${q.id}" value="${oIdx}" class="text-emerald-600 focus:ring-emerald-500">
+                                <span class="leading-relaxed">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div class="hidden bg-emerald-50 text-emerald-800 text-sm p-4 rounded-lg border border-emerald-200 mt-2 leading-relaxed" id="rationale-${q.id}">
+                        <strong>Professor's Rationale:</strong> ${q.rationale}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function gradeQuiz(e) {
+            e.preventDefault();
+            
+            let correctCount = 0;
+            const totalQuestions = examQuestions.length;
+
+            examQuestions.forEach(q => {
+                const selectedOption = document.querySelector(`input[name="question-${q.id}"]:checked`);
+                const card = document.getElementById(`q-card-${q.id}`);
+                const rationaleBox = document.getElementById(`rationale-${q.id}`);
+
+                rationaleBox.classList.remove('hidden');
+
+                if (selectedOption) {
+                    const answerIdx = parseInt(selectedOption.value);
+                    if (answerIdx === q.answer) {
+                        correctCount++;
+                        card.className = 'bg-emerald-50 border-2 border-emerald-400 p-5 rounded-xl flex flex-col gap-3 transition-colors';
+                    } else {
+                        card.className = 'bg-rose-50 border-2 border-rose-300 p-5 rounded-xl flex flex-col gap-3 transition-colors';
+                    }
+                } else {
+                    // Unanswered
+                    card.className = 'bg-rose-50 border-2 border-rose-300 p-5 rounded-xl flex flex-col gap-3 transition-colors';
+                }
+            });
+
+            // Display results container
+            const resultsDiv = document.getElementById('quiz-results');
+            resultsDiv.classList.remove('hidden');
+            document.getElementById('results-score-badge').innerText = `${correctCount} / ${totalQuestions}`;
+
+            // Custom comment breakdown based on score
+            const commentBox = document.getElementById('results-comment');
+            if (correctCount === totalQuestions) {
+                commentBox.innerHTML = `<strong>Magnificent Masterpiece!</strong> "You have obtained a complete, perfect understanding of photosystems, biochemical flow pathways, and ecological solutions. You are officially ready to excel in major university biological science!" &mdash; Dr. Gopalakrishnan`;
+            } else if (correctCount >= 7) {
+                commentBox.innerHTML = `<strong>Great Work!</strong> "You have built an excellent core foundation. Review the detailed rationales on the colored cards above to pinpoint where the electronic grid or carbon cycle calculations tripped you up." &mdash; Dr. Gopalakrishnan`;
+            } else {
+                commentBox.innerHTML = `<strong>Good Effort!</strong> "Photosynthesis is structurally complex. I highly recommend running our Virtual Leaf Disk Assay a few more times to visualize linear pathways, or resetting the Calvin Kitchen to master carbon ratios!" &mdash; Dr. Gopalakrishnan`;
+            }
+
+            // Scroll down to view feedback
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // On App Load Sequence
+        window.onload = function() {
+            switchTab('tab-welcome');
+            showChloroplastPart('outer');
+            updateBakeryUI();
+            generateDisksSetup();
+            renderExamQuestions();
+        };
+    </script>
+</body>
+</html>
