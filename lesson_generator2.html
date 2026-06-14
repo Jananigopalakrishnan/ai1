@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive AI Prompt Generator</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --primary-color: #2b6cb0;
+            --primary-hover: #1d4ed8;
+            --accent-color: #e2e8f0;
+            --border-color: #cbd5e1;
+            --prompt-bg: #f8fafc;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-color: #f8fafc;
+            --primary-color: #3b82f6;
+            --primary-hover: #60a5fa;
+            --accent-color: #334155;
+            --border-color: #475569;
+            --prompt-bg: #0f172a;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .theme-toggle {
+            background: var(--accent-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .grid-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .checkbox-card {
+            display: flex;
+            align-items: center;
+            background: var(--accent-color);
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid transparent;
+        }
+
+        .checkbox-card input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .checkbox-card:hover {
+            border-color: var(--primary-color);
+        }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button.btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 150px;
+            transition: background-color 0.2s;
+        }
+
+        button.btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.btn-secondary {
+            background-color: #475569;
+        }
+        button.btn-secondary:hover {
+            background-color: #334155;
+        }
+
+        .output-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .prompt-box {
+            background-color: var(--prompt-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        @media print {
+            body { background: white; color: black; }
+            .container { box-shadow: none; padding: 0; }
+            .theme-toggle, .form-group, .actions, h1 { display: none !important; }
+            .output-section { display: block !important; }
+            .prompt-box { border: none; max-height: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>AI Lesson Prompt Generator</h1>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle light and dark mode">🌓 Light/Dark</button>
+    </div>
+
+    <div class="form-group">
+        <label for="aiPlatform">Target AI Platform:</label>
+        <select id="aiPlatform">
+            <option value="ChatGPT (GPT-4o)">ChatGPT (GPT-4o)</option>
+            <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet</option>
+            <option value="Google Gemini">Google Gemini</option>
+            <option value="Microsoft Copilot">Microsoft Copilot</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="lessonTitle">Lesson Title:</label>
+        <input type="text" id="lessonTitle" placeholder="e.g., Introduction to Photosynthesis">
+    </div>
+
+    <div class="form-group">
+        <label for="lessonSubject">Lesson Subject / Grade Level:</label>
+        <input type="text" id="lessonSubject" placeholder="e.g., 7th Grade Biology">
+    </div>
+
+    <div class="form-group">
+        <label>Include the following modules in the prompt:</label>
+        <div class="grid-options">
+            <label class="checkbox-card">
+                <input type="checkbox" id="modObjectives" checked> Learning Objectives
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="modPreTest" checked> Pre-test
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="modKeyConcepts" checked> Key Concepts
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="modContent" checked> Core Content
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="modMedia" checked> Video Links & Animations
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="modAnalogies" checked> Analogies & Examples
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="modSummary" checked> Summary
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="modQuiz" checked> Review Quiz
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" id="modADA" checked> ADA Accessibility Checklist
+            </label>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn" onclick="generatePrompt()">Generate Prompt</button>
+        <button class="btn btn-secondary" onclick="copyPrompt()" id="copyBtn">Copy Prompt</button>
+        <button class="btn btn-secondary" onclick="window.print()">Print / Download PDF</button>
+    </div>
+
+    <div class="output-section" id="outputSection">
+        <h3>Generated Master Prompt</h3>
+        <div class="prompt-box" id="promptDisplay"></div>
+    </div>
+</div>
+
+<script>
+    // Theme toggling functionality
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    }
+
+    // Main logic assembling the customized prompt string
+    function generatePrompt() {
+        const platform = document.getElementById('aiPlatform').value;
+        const title = document.getElementById('lessonTitle').value || "[Insert Lesson Title]";
+        const subject = document.getElementById('lessonSubject').value || "[Insert Subject/Grade Level]";
+
+        let promptText = `Act as an expert instructional designer optimized for ${platform}. \n`;
+        promptText += `Generate a comprehensive, structured lesson plan based on the following metadata:\n\n`;
+        promptText += `=========================================\n`;
+        promptText += `LESSON TITLE: ${title}\n`;
+        promptText += `SUBJECT/LEVEL: ${subject}\n`;
+        promptText += `=========================================\n\n`;
+        promptText += `Please construct the lesson explicitly incorporating the following selected components:\n\n`;
+
+        if (document.getElementById('modObjectives').checked) {
+            promptText += `### 1. Learning Objectives\n- Detail 3-4 measurable outcomes using Bloom's Taxonomy suited for this topic.\n\n`;
+        }
+        if (document.getElementById('modPreTest').checked) {
+            promptText += `### 2. Pre-Test\n- Create a 3-question diagnostic quiz to assess prior knowledge before starting.\n\n`;
+        }
+        if (document.getElementById('modKeyConcepts').checked) {
+            promptText += `### 3. Key Concepts\n- Define the vital terminology and vocabulary essential to this lesson.\n\n`;
+        }
+        if (document.getElementById('modContent').checked) {
+            promptText += `### 4. Core Content\n- Write the main narrative text broken down logically with distinct subheadings.\n\n`;
+        }
+        if (document.getElementById('modMedia').checked) {
+            promptText += `### 5. Media & Animations Suggestions\n- Insert relevant, realistic placeholder video content links and describe what explicit concept an animation or simulation should visually show to the learner here.\n\n`;
+        }
+        if (document.getElementById('modAnalogies').checked) {
+            promptText += `### 6. Analogies & Real-World Examples\n- Provide at least one vivid real-world analogy to ground complex or abstract aspects of this concept.\n\n`;
+        }
+        if (document.getElementById('modSummary').checked) {
+            promptText += `### 7. Summary\n- Deliver a concise wrap-up highlighting the key takeaways.\n\n`;
+        }
+        if (document.getElementById('modQuiz').checked) {
+            promptText += `### 8. Review Quiz\n- Build a 5-question multiple-choice review test complete with an answer key and rationales.\n\n`;
+        }
+        if (document.getElementById('modADA').checked) {
+            promptText += `### 9. ADA Accessibility Checklist\n- Incorporate universal design parameters (e.g., alt-text directives for visual elements, clear structural headings, and transcript placeholders for audio components).\n\n`;
+        }
+
+        promptText += `Ensure the output tone is engaging, authoritative, and easily adaptable into an LMS system. Give your answer ready to deploy.`;
+
+        // Reveal text display block
+        document.getElementById('promptDisplay').innerText = promptText;
+        document.getElementById('outputSection').style.display = 'block';
+        
+        // Smooth scroll to the output window
+        document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Clipboard system copying functionality
+    function copyPrompt() {
+        const promptDisplay = document.getElementById('promptDisplay');
+        if (!promptDisplay.innerText) {
+            alert('Please generate a prompt first!');
+            return;
+        }
+
+        navigator.clipboard.writeText(promptDisplay.innerText).then(() => {
+            const copyBtn = document.getElementById('copyBtn');
+            const originalText = copyBtn.innerText;
+            copyBtn.innerText = '✓ Copied!';
+            copyBtn.style.backgroundColor = '#16a34a';
+            
+            setTimeout(() => {
+                copyBtn.innerText = originalText;
+                copyBtn.style.backgroundColor = '';
+            }, 2000);
+        }).catch(err => {
+            alert('Failed to copy text: ', err);
+        });
+    }
+</script>
+
+</body>
+</html>
