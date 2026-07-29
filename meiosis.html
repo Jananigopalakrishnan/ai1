@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Lesson Sandbox: Meiosis vs. Mitosis</title>
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --maternal-color: #3b82f6; /* Accessible Blue */
+            --paternal-color: #ec4899; /* Accessible Pink/Magenta */
+            --accent-green: #10b981;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (min-width: 900px) {
+            .grid {
+                grid-template-columns: 3fr 2fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Controls styling */
+        .control-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #334155;
+        }
+
+        .hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        select:focus {
+            outline: 2px solid var(--maternal-color);
+        }
+
+        button.btn-primary {
+            background-color: var(--maternal-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        button.btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        /* Canvas Arena Styling */
+        .canvas-container {
+            position: relative;
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+            aspect-ratio: 16/9;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Legend item styles */
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .color-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        /* Interactive Quiz / Feedback Module */
+        .quiz-option {
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            background: #f8fafc;
+        }
+
+        .quiz-option:hover {
+            background: #f1f5f9;
+        }
+
+        .quiz-option.correct {
+            background: #d1fae5;
+            border-color: var(--accent-green);
+            color: #065f46;
+        }
+
+        .quiz-option.incorrect {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        /* Matrix Table View */
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .matrix-table th, .matrix-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .matrix-table th {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+
+        .live-badge {
+            background: #e2e8f0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Meiosis & Mitosis Exploration Lab</h1>
+        <p class="subtitle">Interactive Sandbox for Community College Biology — Visualizing Division, Shuffling, & Reduction Division</p>
+    </header>
+
+    <div class="grid">
+        <!-- SIMULATION ARENA -->
+        <div class="card">
+            <div class="card-title">
+                <span>🔬 Interactive Sandbox View</span>
+                <span id="stage-badge" class="live-badge">State: Interphase</span>
+            </div>
+            
+            <div class="canvas-container">
+                <canvas id="sandboxCanvas"></canvas>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="color-box" style="background: var(--maternal-color);"></div>
+                    <span>Maternal Origin Chromosomes</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background: var(--paternal-color);"></div>
+                    <span>Paternal Origin Chromosomes</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background: var(--accent-green); border: 2px dashed #fff;"></div>
+                    <span>Synaptonemal Complex / Crossover Zone</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- LAB INTERFACE CONTROLS -->
+        <div class="card">
+            <div class="card-title">⚙️ Experimental Variables</div>
+            
+            <div class="control-group">
+                <label for="division-type">Select Process Type</label>
+                <select id="division-type">
+                    <option value="meiosis">Meiosis (Reductional & Equational)</option>
+                    <option value="mitosis">Mitosis (Somatic Cloning)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="meiotic-stage">Advance Process Milestone</label>
+                <span class="hint">Walk through the sequential mechanical structural shifts.</span>
+                <select id="meiotic-stage">
+                    <option value="interphase">Interphase (Unreplicated/Replicated Loop)</option>
+                    <option value="prophase1">Prophase I (Synapsis & Crossover Event)</option>
+                    <option value="metaphase1">Metaphase I / II (Alignment on Plate)</option>
+                    <option value="anaphase">Anaphase (Structural Segregation)</option>
+                    <option value="telophase">Telophase & Cytokinesis (Final Yield)</option>
+                </select>
+            </div>
+
+            <div class="control-group" id="crossover-toggle-container">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="crossover-active" checked style="width: auto; cursor: pointer;">
+                    Allow Homologous Crossover (Chiasmata Formation)
+                </label>
+            </div>
+
+            <button id="trigger-action-btn" class="btn-primary">Animate Current Stage State</button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- QUANTITATIVE MATRIX MATRIX -->
+        <div class="card">
+            <div class="card-title">📊 Real-Time Dynamic Feature Comparison</div>
+            <p class="hint">Watch how structural state attributes match or shift based on your selections above.</p>
+            <table class="matrix-table" id="data-matrix">
+                <thead>
+                    <tr>
+                        <th>Cell Attribute Metric</th>
+                        <th>Active Selection Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ploidy Status ($n$)</strong></td>
+                        <td id="matrix-ploidy">Diploid ($2n$)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Individual Chromosomes</strong></td>
+                        <td id="matrix-count">4 Chromosomes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tetrad Structures Visible?</strong></td>
+                        <td id="matrix-tetrads">No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Resulting Genetic Identity</strong></td>
+                        <td id="matrix-identity">Heterogeneous / Unique Swapped Sets</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- STUDENT CASE CRITIQUE AND FORMATIVE CHECK -->
+        <div class="card">
+            <div class="card-title">🧠 Concept Verification Challenge</div>
+            <p style="margin-bottom: 1rem; font-size: 0.95rem;"><strong>Scenario:</strong> A geneticist exposes germ cells to a chemical agent that blocks the expression of <em>cohesin</em> proteins during early prophase stages. What mechanical failure occurs?</p>
+            
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'Cohesin functions as the structural glue keeping sister chromatids safely bound at their centromere cores. Review its role!')">
+                A) Homologous chromosomes lose their ability to find each other to generate a synaptonemal complex.
+            </div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'Spot on! Without functional cohesin holding sister chromatids together, replication splits apart prematurely, destroying synchronized segregation downstream.')">
+                B) Sister chromatids separate prematurely before matching alignment or systemic anaphase pull can be executed safely.
+            </div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'Incorrect. Spindle fibers attach to the kinetochores, which is separate from the physical sister chromatid cohesion track.')">
+                C) Spindle apparatus microtubules lose all structural tracking to the kinetochore plates completely.
+            </div>
+
+            <div id="quiz-feedback" class="feedback-box"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('sandboxCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // State Variables
+    const typeSelect = document.getElementById('division-type');
+    const stageSelect = document.getElementById('meiotic-stage');
+    const crossoverCheck = document.getElementById('crossover-active');
+    const actionBtn = document.getElementById('trigger-action-btn');
+    const stageBadge = document.getElementById('stage-badge');
+
+    // Setup High-DPI Resilient Scale Layout
+    function resizeCanvas() {
+        const rect = canvas.parentNode.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        draw();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    typeSelect.addEventListener('change', () => { adjustPhaseOptions(); updateMatrix(); draw(); });
+    stageSelect.addEventListener('change', () => { updateMatrix(); draw(); });
+    crossoverCheck.addEventListener('change', draw);
+    actionBtn.addEventListener('click', () => { triggerPulseEffect(); });
+
+    let pulseTime = 0;
+    let isAnimating = false;
+
+    function adjustPhaseOptions() {
+        const isMitosis = typeSelect.value === 'mitosis';
+        const crossoverBox = document.getElementById('crossover-toggle-container');
+        
+        if (isMitosis) {
+            crossoverBox.style.display = 'none';
+            stageSelect.options[1].text = "Prophase (Condensation Only)";
+            stageSelect.options[2].text = "Metaphase (Single-File Alignment)";
+        } else {
+            crossoverBox.style.display = 'block';
+            stageSelect.options[1].text = "Prophase I (Synapsis & Crossover Event)";
+            stageSelect.options[2].text = "Metaphase I / II (Alignment on Plate)";
+        }
+    }
+
+    function updateMatrix() {
+        const mode = typeSelect.value;
+        const stage = stageSelect.value;
+        
+        const ploidy = document.getElementById('matrix-ploidy');
+        const count = document.getElementById('matrix-count');
+        const tetrads = document.getElementById('matrix-tetrads');
+        const identity = document.getElementById('matrix-identity');
+
+        stageBadge.textContent = `State: ${stage.toUpperCase()}`;
+
+        if (mode === 'mitosis') {
+            tetrads.textContent = "No (Never forms matching complexes)";
+            identity.textContent = "100% Identical Clones";
+            if (stage === 'telophase') {
+                ploidy.textContent = "Diploid (2n) - Two distinct units";
+                count.textContent = "4 Chromosomes per resulting cell";
+            } else {
+                ploidy.textContent = "Diploid (2n)";
+                count.textContent = "4 Chromosomes total";
+            }
+        } else { // Meiosis
+            if (stage === 'prophase1') {
+                tetrads.textContent = "Yes (4 Chromatids aligned together)";
+            } else {
+                tetrads.textContent = "No (Separated or processed past Act I)";
+            }
+            
+            if (crossoverCheck.checked) {
+                identity.textContent = "Genetically Unique Haploid Blends";
+            } else {
+                identity.textContent = "Reassorted Non-Identical Variants";
+            }
+
+            if (stage === 'telophase') {
+                ploidy.textContent = "Haploid (1n) - Four final units";
+                count.textContent = "2 Chromosomes per daughter gamete";
+            } else if (stage === 'anaphase') {
+                ploidy.textContent = "Transitioning (Reductional Segregation)";
+                count.textContent = "4 Chromosomes total separating";
+            } else {
+                ploidy.textContent = "Diploid (2n)";
+                count.textContent = "4 Chromosomes arranged in pairs";
+            }
+        }
+    }
+
+    function triggerPulseEffect() {
+        if (isAnimating) return;
+        isAnimating = true;
+        let start = null;
+        
+        function step(timestamp) {
+            if (!start) start = timestamp;
+            let progress = timestamp - start;
+            pulseTime = Math.sin(progress / 100) * 8;
+            draw();
+            if (progress < 600) {
+                requestAnimationFrame(step);
+            } else {
+                pulseTime = 0;
+                isAnimating = false;
+                draw();
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    function drawChromatid(x, y, length, angle, color, strokeStyle = "solid") {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.moveTo(0, -length/2);
+        ctx.quadraticCurveTo(length*0.12, 0, 0, length/2);
+        ctx.quadraticCurveTo(-length*0.12, 0, 0, -length/2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        if (strokeStyle === "dashed") {
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = "#ffffff";
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    function drawChromosomeX(x, y, size, colorMain, colorCap, hasCrossover = false) {
+        // Left Chromatid
+        drawChromatid(x - size*0.15, y, size, 0.15, colorMain);
+        // Right Chromatid
+        drawChromatid(x + size*0.15, y, size, -0.15, hasCrossover ? colorCap : colorMain);
+        
+        // Centromere marker
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+    }
+
+    function draw() {
+        const w = canvas.width / window.devicePixelRatio;
+        const h = canvas.height / window.devicePixelRatio;
+        ctx.clearRect(0, 0, w, h);
+
+        const mode = typeSelect.value;
+        const stage = stageSelect.value;
+        const isMeiosis = mode === 'meiosis';
+        const xo = isMeiosis && crossoverCheck.checked;
+
+        const mat = 'rgba(59, 130, 246, 0.9)';
+        const pat = 'rgba(236, 72, 153, 0.9)';
+
+        // Base cell boundaries
+        ctx.strokeStyle = "rgba(255,255,255,0.2)";
+        ctx.lineWidth = 3;
+
+        if (stage === 'telophase') {
+            // Display final split cells
+            const cellsCount = isMeiosis ? 4 : 2;
+            for(let i=0; i<cellsCount; i++) {
+                let cx = w / (cellsCount + 1) * (i + 1);
+                let cy = h / 2;
+                ctx.beginPath();
+                ctx.arc(cx, cy, h * 0.22, 0, Math.PI*2);
+                ctx.fillStyle = "rgba(255,255,255,0.05)";
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw contents inside final yields
+                if (!isMeiosis) {
+                    drawChromatid(cx - 10, cy, 30, 0, mat);
+                    drawChromatid(cx + 10, cy, 30, 0, pat);
+                } else {
+                    // Meiotic terminal haploid distribution variety
+                    if (i === 0) drawChromatid(cx, cy, 25, 0.2, mat);
+                    if (i === 1) drawChromatid(cx, cy, 25, -0.2, mat, xo ? "dashed" : "solid");
+                    if (i === 2) drawChromatid(cx, cy, 25, 0.1, pat, xo ? "dashed" : "solid");
+                    if (i === 3) drawChromatid(cx, cy, 25, -0.1, pat);
+                }
+            }
+            return;
+        }
+
+        // Standard single main cell track container
+        ctx.beginPath();
+        ctx.arc(w/2, h/2, h*0.4, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(255,255,255,0.03)";
+        ctx.fill();
+        ctx.stroke();
+
+        let offset = pulseTime;
+
+        if (stage === 'interphase') {
+            // Chromatin cloud simulation presentation
+            for(let i=0; i<30; i++) {
+                ctx.fillStyle = i % 2 === 0 ? mat : pat;
+                ctx.beginPath();
+                ctx.arc(w/2 - 50 + Math.sin(i)*40, h/2 + Math.cos(i)*30, 6, 0, Math.PI*2);
+                ctx.fill();
+            }
+        } 
+        else if (stage === 'prophase1') {
+            if (isMeiosis) {
+                // Highlight synaptonemal complex zone box
+                ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
+                ctx.fillRect(w/2 - 60, h/2 - 50, 120, 100);
+                ctx.setLineDash([4, 4]);
+                ctx.strokeStyle = "rgba(16, 185, 129, 0.7)";
+                ctx.strokeRect(w/2 - 60, h/2 - 50, 120, 100);
+                ctx.setLineDash([]);
+
+                // Visualizing paired close physical tetrad arrangement
+                drawChromosomeX(w/2 - 25 - offset, h/2, 60, mat, pat, xo);
+                drawChromosomeX(w/2 + 25 + offset, h/2, 60, pat, mat, xo);
+            } else {
+                drawChromosomeX(w/2 - 40, h/2 - 20, 50, mat, pat, false);
+                drawChromosomeX(w/2 + 40, h/2 + 20, 50, pat, mat, false);
+            }
+        } 
+        else if (stage === 'metaphase1') {
+            // Draw metaphase plate dynamic center line
+            ctx.strokeStyle = "rgba(255,255,255,0.15)";
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath(); ctx.moveTo(w/2, 10); ctx.lineTo(w/2, h-10); ctx.stroke();
+            ctx.setLineDash([]);
+
+            if (isMeiosis) {
+                // Double-file alignment configuration
+                drawChromosomeX(w/2 - 30, h/2 - 30 + offset, 55, mat, pat, xo);
+                drawChromosomeX(w/2 + 30, h/2 - 30 - offset, 55, pat, mat, xo);
+            } else {
+                // Single-file line setup
+                drawChromosomeX(w/2, h/2 - 40, 50, mat, pat, false);
+                drawChromosomeX(w/2, h/2 + 40, 50, pat, mat, false);
+            }
+        } 
+        else if (stage === 'anaphase') {
+            // Separation pulling trajectories
+            if (isMeiosis) {
+                // Pulling intact replicated dyads apart (Reductional)
+                drawChromosomeX(w/2 - 80 - offset, h/2 - 20, 50, mat, pat, xo);
+                drawChromosomeX(w/2 + 80 + offset, h/2 + 20, 50, pat, mat, xo);
+            } else {
+                // Breaking sister cores down explicitly
+                drawChromatid(w/2 - 80 - offset, h/2 - 30, 40, 0.5, mat);
+                drawChromatid(w/2 + 80 + offset, h/2 - 30, 40, -0.5, mat);
+                drawChromatid(w/2 - 80 - offset, h/2 + 30, 40, 0.5, pat);
+                drawChromatid(w/2 + 80 + offset, h/2 + 30, 40, -0.5, pat);
+            }
+        }
+    }
+
+    function checkAnswer(element, isCorrect, feedbackText) {
+        // Reset styles across options
+        const options = document.querySelectorAll('.quiz-option');
+        options.forEach(opt => {
+            opt.classList.remove('correct', 'incorrect');
+        });
+
+        const feedbackBox = document.getElementById('quiz-feedback');
+        feedbackBox.style.display = "block";
+        feedbackBox.textContent = feedbackText;
+
+        if (isCorrect) {
+            element.classList.add('correct');
+            feedbackBox.style.backgroundColor = "#d1fae5";
+            feedbackBox.style.color = "#065f46";
+        } else {
+            element.classList.add('incorrect');
+            feedbackBox.style.backgroundColor = "#fee2e2";
+            feedbackBox.style.color = "#991b1b";
+        }
+    }
+
+    // Initialize layout setup on launch
+    adjustPhaseOptions();
+    resizeCanvas();
+    updateMatrix();
+</script>
+
+</body>
+</html>
