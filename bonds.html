@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonds: How Atoms Hold On (and Let Go)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0F1626;
+    --surface: #182238;
+    --surface-2: #202c47;
+    --text: #EDEFF5;
+    --text-dim: #93A0BE;
+    --covalent: #4FD8C4;
+    --ionic: #FF6B5B;
+    --hbond: #C9A6FF;
+    --line: rgba(147,160,190,0.18);
+    --radius: 14px;
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'IBM Plex Sans', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--body); line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:var(--display); font-weight:600; letter-spacing:-0.01em;}
+  .mono{font-family:var(--mono);}
+  a{color:var(--covalent);}
+  button:focus-visible, .choice:focus-visible, .card:focus-visible, select:focus-visible{
+    outline:2px solid var(--covalent); outline-offset:2px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  /* Progress bar */
+  #progress-wrap{
+    position:sticky; top:0; z-index:50; background:rgba(15,22,38,0.9);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line); padding:10px 16px;
+  }
+  #progress-track{
+    max-width:760px; margin:0 auto; height:5px; background:var(--surface-2);
+    border-radius:99px; overflow:hidden;
+  }
+  #progress-fill{
+    height:100%; width:0%; background:linear-gradient(90deg, var(--ionic), var(--hbond), var(--covalent));
+    transition:width 0.4s ease;
+  }
+  #progress-label{
+    max-width:760px; margin:6px auto 0; font-size:0.72rem; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:0.08em;
+  }
+
+  .wrap{max-width:760px; margin:0 auto; padding:0 20px;}
+  section{padding:64px 0; border-bottom:1px solid var(--line);}
+  section:last-child{border-bottom:none;}
+
+  /* Hero */
+  #hero{padding-top:56px; padding-bottom:48px; text-align:left;}
+  .eyebrow{
+    font-family:var(--mono); font-size:0.75rem; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:0.14em; margin-bottom:14px;
+  }
+  #hero h1{font-size:clamp(2rem, 5vw, 3rem); margin:0 0 18px; max-width:14ch;}
+  #hero p{color:var(--text-dim); max-width:52ch; font-size:1.05rem;}
+  .atom-hero{
+    display:flex; justify-content:center; align-items:center; margin:36px 0 8px;
+  }
+  .atom{position:relative; width:140px; height:140px;}
+  .nucleus{
+    position:absolute; top:50%; left:50%; width:22px; height:22px; margin:-11px 0 0 -11px;
+    background:radial-gradient(circle at 35% 35%, #fff, var(--ionic) 60%); border-radius:50%;
+    box-shadow:0 0 22px rgba(255,107,91,0.6);
+  }
+  .orbit{
+    position:absolute; top:50%; left:50%; border:1px solid rgba(147,160,190,0.35);
+    border-radius:50%; transform:translate(-50%,-50%);
+  }
+  .orbit.o1{width:140px; height:140px; animation:spin 7s linear infinite;}
+  .orbit.o2{width:140px; height:90px; animation:spin 5s linear infinite reverse;}
+  .electron{
+    position:absolute; width:9px; height:9px; border-radius:50%; background:var(--covalent);
+    top:-4.5px; left:50%; margin-left:-4.5px; box-shadow:0 0 8px var(--covalent);
+  }
+  @keyframes spin{from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);}}
+
+  /* Section labels */
+  .label{
+    display:inline-block; font-family:var(--mono); font-size:0.72rem; text-transform:uppercase;
+    letter-spacing:0.12em; padding:5px 12px; border-radius:99px; margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  .label.ionic{color:var(--ionic); border-color:rgba(255,107,91,0.4);}
+  .label.covalent{color:var(--covalent); border-color:rgba(79,216,196,0.4);}
+  .label.hbond{color:var(--hbond); border-color:rgba(201,166,255,0.4);}
+  .label.assess{color:var(--text-dim);}
+
+  h2.title{font-size:clamp(1.5rem,3.4vw,2rem); margin:0 0 6px;}
+  .sub{color:var(--text-dim); margin:0 0 28px; max-width:56ch;}
+
+  /* Cards */
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px 24px; margin-bottom:20px;
+  }
+  .card h3{margin:0 0 10px; font-size:1.05rem;}
+  .card.analogy{border-left:3px solid var(--hbond);}
+  .card.video{display:flex; gap:14px; align-items:flex-start;}
+  .video-icon{
+    flex:0 0 auto; width:38px; height:38px; border-radius:8px; background:var(--surface-2);
+    display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+  }
+  .bridge{
+    font-style:italic; color:var(--text-dim); border-top:1px dashed var(--line);
+    padding-top:14px; margin-top:6px; font-size:0.95rem;
+  }
+
+  /* Questions */
+  .q{margin-bottom:26px;}
+  .q-prompt{font-weight:500; margin-bottom:12px;}
+  .choices{display:flex; flex-direction:column; gap:8px;}
+  .choice{
+    text-align:left; background:var(--surface); border:1px solid var(--line); color:var(--text);
+    border-radius:10px; padding:12px 14px; cursor:pointer; font-family:var(--body); font-size:0.96rem;
+    transition:border-color .15s, background .15s;
+  }
+  .choice:hover{border-color:var(--text-dim);}
+  .choice.correct{border-color:var(--covalent); background:rgba(79,216,196,0.1);}
+  .choice.incorrect{border-color:var(--ionic); background:rgba(255,107,91,0.1);}
+  .choice:disabled{cursor:default;}
+  .feedback{
+    margin-top:10px; padding:12px 14px; border-radius:10px; background:var(--surface-2);
+    font-size:0.92rem; color:var(--text-dim); display:none;
+  }
+  .feedback.show{display:block;}
+
+  /* Click-to-reveal formative activity */
+  .reveal-card{
+    background:var(--surface); border:1px dashed var(--line); border-radius:var(--radius);
+    padding:20px; cursor:pointer;
+  }
+  .reveal-card .answer{display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); color:var(--text-dim);}
+  .reveal-card.open .answer{display:block;}
+  .reveal-card .hint{font-family:var(--mono); font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em;}
+
+  /* Match activity */
+  .match-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 18px;}
+  @media (max-width:520px){.match-grid{grid-template-columns:1fr;}}
+  .match-item{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:10px 12px;
+    cursor:pointer; font-size:0.9rem; user-select:none;
+  }
+  .match-item.selected{border-color:var(--hbond);}
+  .match-item.matched{border-color:var(--covalent); opacity:0.6; cursor:default;}
+  .match-item.wrong{border-color:var(--ionic);}
+
+  /* Simulations */
+  .sim{
+    background:var(--surface-2); border-radius:var(--radius); padding:22px; margin:16px 0;
+  }
+  .sim-label{font-family:var(--mono); font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.1em; margin-bottom:14px;}
+
+  /* Ionic sim: Lewis dot electron transfer */
+  #ionic-sim-stage.lewis-stage{
+    position:relative; width:100%; max-width:340px; height:200px; margin:0 auto;
+  }
+  .lewis-atom{
+    position:absolute; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:var(--display); font-weight:700; font-size:1.1rem;
+  }
+  .lewis-atom.na-symbol{background:radial-gradient(circle at 35% 35%, #4a5a86, #1f2a47); border:2px solid #6b7db3;}
+  .lewis-atom.cl-symbol{background:radial-gradient(circle at 35% 35%, #3a5c56, #14251f); border:2px solid #4FD8C4;}
+  .lewis-dot{
+    position:absolute; width:10px; height:10px; border-radius:50%; background:#ffe27a;
+    box-shadow:0 0 6px #ffe27a; transition:left 0.9s ease, top 0.9s ease;
+  }
+  .lewis-charge{
+    position:absolute; font-family:var(--mono); font-weight:700; font-size:1.05rem; opacity:0; transition:opacity .3s;
+  }
+  .lewis-charge.show{opacity:1;}
+  .ionic-btn, .sim-btn{
+    background:var(--covalent); color:#08221d; border:none; border-radius:8px; padding:9px 16px;
+    font-family:var(--body); font-weight:600; cursor:pointer; font-size:0.88rem;
+  }
+  .ionic-btn:hover, .sim-btn:hover{filter:brightness(1.08);}
+  .sim-controls{display:flex; justify-content:center; gap:10px; margin-top:16px; flex-wrap:wrap;}
+
+  /* Covalent sim: Lewis dot structures (O2 double bond + water polarity) */
+  #covalent-sim-stage{display:flex; align-items:center; justify-content:center; min-height:160px; position:relative;}
+  .molecule-o2{position:relative; width:240px; height:140px;}
+  .o-atom{
+    position:absolute; width:64px; height:64px; border-radius:50%; top:38px;
+    background:radial-gradient(circle at 35% 35%, #4c7d78, #1c332f); border:2px solid var(--covalent);
+    display:flex; align-items:center; justify-content:center; font-family:var(--display); font-weight:700;
+  }
+  .o-atom.left{left:0;}
+  .o-atom.right{right:0;}
+  .lone-pair{position:absolute; display:flex; gap:4px;}
+  .lone-pair span{width:7px; height:7px; border-radius:50%; background:#ffe27a; box-shadow:0 0 5px #ffe27a;}
+  .lone-pair.top{top:-18px; left:50%; transform:translateX(-50%);}
+  .lone-pair.bottom{bottom:-18px; left:50%; transform:translateX(-50%);}
+  .lone-pair.upper-left{top:-6px; left:-16px;}
+  .lone-pair.upper-right{top:-6px; right:-16px;}
+  .double-bond-dots{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .double-bond-dots .pair{display:flex; gap:6px;}
+  .double-bond-dots .pair span{
+    width:8px; height:8px; border-radius:50%; background:#ffe27a; box-shadow:0 0 6px #ffe27a;
+    animation:orbit-shared 3s linear infinite;
+  }
+  .double-bond-dots .pair:nth-child(2) span{animation-delay:1.5s;}
+  @keyframes orbit-shared{
+    0%,100%{transform:translateY(0);} 50%{transform:translateY(5px);}
+  }
+  #water-lewis-stage{position:relative; width:220px; height:120px; margin:24px auto 0;}
+
+  /* Polarity slider (water) */
+  #polarity-sim{padding:10px 4px;}
+  .water-diagram{display:flex; justify-content:center; margin-bottom:18px;}
+  .water-molecule{position:relative; width:220px; height:110px;}
+  .w-o{
+    position:absolute; left:50%; top:6px; transform:translateX(-50%); width:56px; height:56px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #4c7d78, #1c332f); border:2px solid var(--covalent);
+    display:flex; align-items:center; justify-content:center; font-family:var(--display); font-weight:700; z-index:2;
+  }
+  .w-h{
+    position:absolute; bottom:0; width:34px; height:34px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #6a7aa8, #232f52); border:2px solid #8b9be0;
+    display:flex; align-items:center; justify-content:center; font-family:var(--display); font-weight:700; font-size:0.8rem;
+  }
+  .w-h.left{left:20px;}
+  .w-h.right{right:20px;}
+  .delta{position:absolute; font-family:var(--mono); font-size:0.85rem; font-weight:600;}
+  .delta.neg{top:-6px; left:50%; transform:translateX(-50%); color:var(--ionic);}
+  .delta.pos-l{bottom:34px; left:34px; color:var(--covalent);}
+  .delta.pos-r{bottom:34px; right:34px; color:var(--covalent);}
+  input[type=range]{width:100%; accent-color:var(--hbond);}
+  .slider-row{display:flex; align-items:center; gap:14px; margin-bottom:10px;}
+  .slider-readout{font-family:var(--mono); font-size:0.85rem; color:var(--text-dim); min-width:150px; text-align:right;}
+
+  /* Hydrogen bond sim: O of one molecule to H of another, explicitly */
+  #hbond-sim-stage{position:relative; width:100%; max-width:350px; height:160px; margin:0 auto;}
+  .hb-atom{
+    position:absolute; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:var(--display); font-weight:700; z-index:2;
+  }
+  .hb-atom.hb-o{width:44px; height:44px; font-size:0.95rem; background:radial-gradient(circle at 35% 35%, #4c7d78, #1c332f); border:2px solid var(--covalent);}
+  .hb-atom.hb-h{width:26px; height:26px; font-size:0.7rem; background:radial-gradient(circle at 35% 35%, #6a7aa8, #232f52); border:2px solid #8b9be0;}
+  .hb-delta{position:absolute; font-family:var(--mono); font-size:0.72rem; font-weight:600;}
+  .hb-delta.neg{color:var(--ionic);}
+  .hb-delta.pos{color:var(--covalent);}
+  .hb-caption-label{
+    position:absolute; font-family:var(--mono); font-size:0.66rem; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:.05em; text-align:center; transition:opacity 0.3s;
+  }
+  .hbond-line{
+    position:absolute; height:2px; background:repeating-linear-gradient(90deg, var(--hbond) 0 6px, transparent 6px 12px);
+    transition:opacity 0.3s;
+  }
+
+  /* Predictor tool (signature element) */
+  #predictor{
+    background:linear-gradient(160deg, var(--surface), var(--surface-2));
+    border:1px solid var(--line); border-radius:18px; padding:28px;
+  }
+  .predictor-controls{display:flex; gap:16px; flex-wrap:wrap; margin-bottom:22px;}
+  .predictor-field{flex:1; min-width:140px;}
+  .predictor-field label{display:block; font-family:var(--mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); margin-bottom:6px;}
+  select{
+    width:100%; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:8px;
+    padding:10px 12px; font-family:var(--body); font-size:0.95rem;
+  }
+  .en-readout{display:flex; gap:20px; margin-bottom:20px; font-family:var(--mono); font-size:0.85rem; color:var(--text-dim); flex-wrap:wrap;}
+  .en-readout b{color:var(--text); font-size:1.1rem;}
+  .spectrum{position:relative; height:14px; border-radius:99px; margin:34px 0 10px;
+    background:linear-gradient(90deg, var(--covalent) 0%, var(--covalent) 22%, var(--hbond) 50%, var(--ionic) 78%, var(--ionic) 100%);
+  }
+  .spectrum-marker{
+    position:absolute; top:-10px; width:2px; height:34px; background:#fff; transform:translateX(-50%);
+    transition:left 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+  .spectrum-marker::after{
+    content:''; position:absolute; top:-9px; left:-6px; width:14px; height:14px; border-radius:50%;
+    background:#fff; box-shadow:0 0 10px rgba(255,255,255,0.7);
+  }
+  .spectrum-zones{display:flex; justify-content:space-between; gap:8px; margin-top:10px;}
+  .zone-item{display:flex; flex-direction:column; flex:1; text-align:center;}
+  .zone-item:first-child{text-align:left; align-items:flex-start;}
+  .zone-item:last-child{text-align:right; align-items:flex-end;}
+  .zone-name{
+    font-family:var(--mono); font-size:0.68rem; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--text-dim); margin-bottom:3px;
+  }
+  .zone-range{
+    font-family:var(--mono); font-size:1rem; font-weight:700; letter-spacing:.02em;
+  }
+  .zone-item.zone-covalent .zone-range{color:var(--covalent);}
+  .zone-item.zone-polar .zone-range{color:var(--hbond);}
+  .zone-item.zone-ionic .zone-range{color:var(--ionic);}
+  .predictor-result{
+    margin-top:22px; padding:18px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid var(--line);
+  }
+  .predictor-result h4{margin:0 0 8px; font-family:var(--display);}
+  .predictor-result .pill{
+    display:inline-block; font-family:var(--mono); font-size:0.72rem; padding:4px 10px; border-radius:99px;
+    margin-bottom:10px; text-transform:uppercase; letter-spacing:.08em;
+  }
+
+  /* Score summary */
+  #score-box{
+    display:none; text-align:center; padding:20px; border-radius:14px; background:var(--surface);
+    border:1px solid var(--line); margin-top:20px;
+  }
+  #score-box.show{display:block;}
+  #score-box .big{font-family:var(--display); font-size:2.2rem;}
+
+  .submit-btn{
+    background:var(--hbond); color:#1c1233; border:none; border-radius:10px; padding:12px 22px;
+    font-family:var(--body); font-weight:600; cursor:pointer; font-size:0.95rem; margin-top:8px;
+  }
+  .submit-btn:hover{filter:brightness(1.08);}
+  .submit-btn:disabled{opacity:0.5; cursor:default;}
+
+  footer{padding:36px 0 60px; text-align:center; color:var(--text-dim); font-size:0.85rem;}
+</style>
+</head>
+<body>
+
+<div id="progress-wrap">
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <div id="progress-label">Start</div>
+</div>
+
+<div class="wrap">
+
+  <section id="hero">
+    <div class="eyebrow">OpenStax Biology 2e · Ch. 2.3 · Chemical Bonds</div>
+    <h1>Bonds: How Atoms Hold On (and Let Go)</h1>
+    <p>Every reaction in your body — nerve signals, DNA holding its shape, enzymes folding just right — comes down to how tightly (or loosely) atoms hold onto their electrons. By the end of this lesson you'll be able to <strong>tell ionic, covalent, and hydrogen bonds apart, and predict which one forms just by looking at two elements' electronegativity values.</strong></p>
+    <div class="atom-hero">
+      <div class="atom">
+        <div class="orbit o1"><div class="electron"></div></div>
+        <div class="orbit o2"><div class="electron" style="background:var(--ionic); box-shadow:0 0 8px var(--ionic);"></div></div>
+        <div class="nucleus"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRE-ASSESSMENT -->
+  <section id="pre" data-section="Pre-check">
+    <span class="label assess">Before we start</span>
+    <h2 class="title">What do you already think?</h2>
+    <p class="sub">No grades here — just a gut-check. Answer honestly; misconceptions are normal and this just helps you notice what's about to click.</p>
+
+    <div class="q" data-qid="pre1">
+      <div class="q-prompt">1. True or false: in every chemical bond, one atom completely gives an electron to another atom.</div>
+      <div class="choices">
+        <button class="choice" data-correct="false">True</button>
+        <button class="choice" data-correct="true">False</button>
+      </div>
+      <div class="feedback">Some bonds do work that way (that's <em>ionic</em>, coming up) — but many atoms instead <em>share</em> electrons. You'll see both today.</div>
+    </div>
+
+    <div class="q" data-qid="pre2">
+      <div class="q-prompt">2. Table salt (NaCl) is solid and stable at room temperature. What do you think is actually holding the sodium and chlorine together?</div>
+      <div class="choices">
+        <button class="choice" data-correct="false">A strong invisible glue between them</button>
+        <button class="choice" data-correct="true">One atom's electron has moved to the other, creating two oppositely charged particles that attract</button>
+        <button class="choice" data-correct="false">They vibrate at the same frequency and stick</button>
+      </div>
+      <div class="feedback">That's the idea behind an <em>ionic bond</em> — you'll build one yourself in a minute.</div>
+    </div>
+
+    <div class="q" data-qid="pre3">
+      <div class="q-prompt">3. True or false: the two electrons shared between two hydrogen atoms in H₂ are shared perfectly equally.</div>
+      <div class="choices">
+        <button class="choice" data-correct="true">True</button>
+        <button class="choice" data-correct="false">False</button>
+      </div>
+      <div class="feedback">Correct-ish instinct to test: identical atoms pull equally hard on shared electrons. Different atoms usually don't — that's where things get interesting.</div>
+    </div>
+
+    <div class="q" data-qid="pre4">
+      <div class="q-prompt">4. What do you think actually determines whether two atoms share electrons evenly, share unevenly, or fully transfer one?</div>
+      <div class="choices">
+        <button class="choice" data-correct="false">How big or heavy the atoms are</button>
+        <button class="choice" data-correct="true">How strongly each atom "pulls" on electrons compared to the other</button>
+        <button class="choice" data-correct="false">Random chance</button>
+      </div>
+      <div class="feedback">That "pulling power" has a name: electronegativity. It's the whole key to predicting bond type — you'll use it yourself later in this lesson.</div>
+    </div>
+
+    <div class="q" data-qid="pre5">
+      <div class="q-prompt">5. True or false: a "hydrogen bond" is just a regular covalent bond that happens to involve a hydrogen atom.</div>
+      <div class="choices">
+        <button class="choice" data-correct="false">True</button>
+        <button class="choice" data-correct="true">False</button>
+      </div>
+      <div class="feedback">Trap question, and a very common mix-up — hydrogen bonds are actually a totally different, weaker kind of attraction <em>between</em> molecules, not within one. More on this soon.</div>
+    </div>
+  </section>
+
+  <!-- IONIC -->
+  <section id="ionic" data-section="Ionic bonds">
+    <span class="label ionic">Concept 1 · Ionic Bonds</span>
+    <h2 class="title">When one atom just takes the electron</h2>
+    <p class="sub">Read the section below carefully before touching the simulation — you'll get more out of watching the transfer if you already know why it happens.</p>
+
+    <div class="card">
+      <p>Every atom "wants" a full outer shell of electrons, and some atoms are much better than others at pulling electrons toward themselves. When the difference in that pulling power (electronegativity) between two atoms is large enough, the weaker-pulling atom doesn't just lose the tug-of-war — it loses the electron entirely. That electron transfers completely to the other atom.</p>
+      <p>Once that happens, the atom that gave up an electron now has one more proton than electron, so it carries an overall positive charge. The atom that received the electron now has one more electron than proton, so it carries a negative charge. These charged atoms are called <strong>ions</strong>, and the electrostatic attraction between the resulting positive ion (cation) and negative ion (anion) <em>is</em> the ionic bond — no shared electrons involved at all, just two oppositely charged particles holding onto each other.</p>
+      <p>Sodium (Na) is a classic example: it has just one lonely electron in its outer shell, and it's much easier for sodium to give that single electron away than to find seven more to fill the shell. Chlorine (Cl), on the other hand, already has seven outer electrons and just needs one more to complete its shell — so it's a very willing recipient. That mismatch is exactly why NaCl (table salt) forms so readily.</p>
+    </div>
+
+    <div class="card analogy">
+      <h3>🎾 The analogy</h3>
+      <p>Think of two kids fighting over a ball. If one kid is way stronger, they don't share it — they just take it. Now one kid has the ball (and feels smug/negative about it) and the other has nothing (and feels the loss/positive about it). They still stick around each other because the "loser" wants the ball back and the "winner" doesn't want to give it up — that tug-of-war <em>is</em> the bond.</p>
+    </div>
+
+    <div class="sim">
+      <div class="sim-label">Simulation · Lewis dot structures — watch the electron transfer</div>
+      <div id="ionic-sim-stage" class="lewis-stage">
+        <div class="lewis-atom na-symbol" style="left:40px; top:55px;">Na</div>
+        <div class="lewis-atom cl-symbol" style="left:200px; top:55px;">Cl</div>
+
+        <!-- Na's single valence electron — the one that moves -->
+        <div class="lewis-dot" id="na-electron" style="left:75px; top:44px;"></div>
+
+        <!-- Cl's other 6 valence electrons (3 complete lone pairs) -->
+        <div class="lewis-dot" style="left:227px; top:44px;"></div>
+        <div class="lewis-dot" style="left:243px; top:44px;"></div>
+        <div class="lewis-dot" style="left:281px; top:82px;"></div>
+        <div class="lewis-dot" style="left:281px; top:98px;"></div>
+        <div class="lewis-dot" style="left:227px; top:136px;"></div>
+        <div class="lewis-dot" style="left:243px; top:136px;"></div>
+        <!-- Cl's 7th electron, already there, waiting for a partner -->
+        <div class="lewis-dot" id="cl-single-electron" style="left:189px; top:98px;"></div>
+
+        <div class="lewis-charge" id="na-plus" style="left:112px; top:20px; color:var(--ionic);">+</div>
+        <div class="lewis-charge" id="cl-minus" style="left:272px; top:20px; color:var(--covalent);">–</div>
+      </div>
+      <div class="sim-controls">
+        <button class="ionic-btn" id="ionic-transfer-btn">Transfer the electron</button>
+        <button class="ionic-btn" id="ionic-reset-btn" style="background:var(--surface-2); color:var(--text);">Reset</button>
+      </div>
+      <p style="text-align:center; color:var(--text-dim); font-size:0.85rem; margin-top:10px;">Each dot is one valence electron. Sodium has 1 to lose; chlorine has 7 and needs exactly 1 more. Click the button and watch sodium's electron travel across and pair up with chlorine's lone electron — completing chlorine's shell and leaving sodium's empty.</p>
+    </div>
+
+    <div class="card video">
+      <div class="video-icon">▶</div>
+      <div>
+        <h3 style="margin-bottom:4px;">Watch: Bozeman Science — Ionic Bonding</h3>
+        <p style="margin:0; color:var(--text-dim);"><a href="http://www.bozemanscience.com/ap-chem-020-ionic-bonding" target="_blank" rel="noopener">bozemanscience.com/ap-chem-020-ionic-bonding</a> — Paul Andersen explains how ionic solids form when cations and anions attract, and how bond strength relates to charge and distance.</p>
+      </div>
+    </div>
+
+    <div class="reveal-card" id="ionic-reveal" tabindex="0" role="button">
+      <div class="hint">Click to check yourself</div>
+      <p style="margin:10px 0 0;"><strong>Quick check:</strong> after sodium (Na) gives up its electron to chlorine (Cl), what charge does each ion have — and why do they stay together?</p>
+      <div class="answer">Na becomes <strong>Na⁺</strong> (lost a negative electron, so it's now positively charged) and Cl becomes <strong>Cl⁻</strong> (gained a negative electron). Opposite charges attract — that electrostatic pull <em>is</em> the ionic bond.</div>
+    </div>
+
+    <p class="bridge">Why this matters for biology: ionic bonds are why salts like NaCl or KCl dissolve into charged ions in water — and those ions (Na⁺, K⁺, Ca²⁺) are exactly what your neurons use to fire electrical signals.</p>
+  </section>
+
+  <!-- COVALENT -->
+  <section id="covalent" data-section="Covalent bonds">
+    <span class="label covalent">Concept 2 · Covalent Bonds</span>
+    <h2 class="title">When atoms share instead of steal</h2>
+    <p class="sub">Read carefully — this concept has two flavors, and telling them apart is exactly the skill you'll practice in the predictor tool later in this lesson.</p>
+
+    <div class="card">
+      <p>A covalent bond forms when two atoms both hold onto a shared pair of electrons instead of one atom taking it completely. This happens when the two atoms' pulling power on electrons is fairly similar — neither one is a clear "winner," so instead of a transfer, they compromise by sharing. Covalent bonds are usually stronger and more stable than the electrostatic attraction in an ionic bond, which is exactly why they form the backbone of nearly every large molecule in your body: DNA, proteins, carbohydrates, and lipids are all held together primarily by covalent bonds.</p>
+      <p>But "sharing" doesn't always mean "sharing equally," and this is the part students often miss. Covalent bonds actually come in two flavors:</p>
+      <p><strong>Nonpolar covalent bonds</strong> form when the two atoms have the same (or nearly the same) electronegativity — like two identical oxygen atoms bonded to each other. Since neither atom pulls harder, the shared electrons sit right in the middle, and neither side of the bond develops any charge.</p>
+      <p><strong>Polar covalent bonds</strong> form when two different atoms share electrons unevenly, because one atom's pull is measurably stronger — just not strong enough to fully steal the electron away. The stronger-pulling atom ends up slightly negative (written δ−, "delta minus"), and the weaker-pulling atom ends up slightly positive (δ+). It's still a covalent bond — the electrons are shared, not transferred — but the sharing is lopsided.</p>
+    </div>
+
+    <div class="card analogy">
+      <h3>🤝 The analogy</h3>
+      <p>Picture two kids holding one ball between them. If they're evenly matched, the ball sits dead-center between their hands — that's nonpolar. If one kid is a little stronger (but not strong enough to just take it), the ball drifts noticeably toward their side while both hands are still on it — that's polar. Nobody let go; the position just shifted.</p>
+    </div>
+
+    <div class="sim">
+      <div class="sim-label">Simulation · O₂'s Lewis structure (nonpolar)</div>
+      <div id="covalent-sim-stage">
+        <div class="molecule-o2">
+          <div class="o-atom left">O
+            <div class="lone-pair top"><span></span><span></span></div>
+            <div class="lone-pair bottom"><span></span><span></span></div>
+          </div>
+          <div class="double-bond-dots">
+            <div class="pair"><span></span><span></span></div>
+            <div class="pair"><span></span><span></span></div>
+          </div>
+          <div class="o-atom right">O
+            <div class="lone-pair top"><span></span><span></span></div>
+            <div class="lone-pair bottom"><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+      <p style="text-align:center; color:var(--text-dim); font-size:0.85rem; margin-top:10px;">Oxygen needs 2 more electrons to complete its outer shell, so each O atom shares <em>two</em> pairs with the other — a double bond, 4 electrons total — while 2 lone pairs sit untouched on each atom. Because both atoms are oxygen, the sharing is perfectly even: nonpolar.</p>
+    </div>
+
+    <div class="sim">
+      <div class="sim-label">Simulation · Water's Lewis structure (polar)</div>
+      <div id="water-lewis-stage" class="water-molecule">
+        <div class="w-o" style="width:56px; height:56px;">O
+          <div class="lone-pair upper-left"><span></span><span></span></div>
+          <div class="lone-pair upper-right"><span></span><span></span></div>
+          <span class="delta neg">δ−</span>
+        </div>
+        <div class="w-h left">H<span class="delta pos-l">δ+</span></div>
+        <div class="w-h right">H<span class="delta pos-r">δ+</span></div>
+      </div>
+      <p style="text-align:center; color:var(--text-dim); font-size:0.85rem; margin-top:10px;">Oxygen (EN 3.44) pulls harder than hydrogen (EN 2.20) on each shared pair, so the electrons spend more time near O. That gives oxygen a partial negative charge and each hydrogen a partial positive charge — still covalent, still shared, just unevenly. Notice O also keeps 2 lone pairs of its own, untouched by either bond.</p>
+    </div>
+
+    <div class="card video">
+      <div class="video-icon">▶</div>
+      <div>
+        <h3 style="margin-bottom:4px;">Watch: Bozeman Science — Covalent Bonding</h3>
+        <p style="margin:0; color:var(--text-dim);"><a href="http://www.bozemanscience.com/ap-chem-019-covalent-bonding" target="_blank" rel="noopener">bozemanscience.com/ap-chem-019-covalent-bonding</a> — Paul Andersen explains how covalent bonds form and how bond energy relates to the distance between atoms.</p>
+      </div>
+    </div>
+
+    <div class="card video">
+      <div class="video-icon">▶</div>
+      <div>
+        <h3 style="margin-bottom:4px;">Watch: Bozeman Science — Covalent vs. Ionic</h3>
+        <p style="margin:0; color:var(--text-dim);"><a href="http://www.bozemanscience.com/chemical-bonds-covalent-vs-ionic" target="_blank" rel="noopener">bozemanscience.com/chemical-bonds-covalent-vs-ionic</a> — walks through exactly how to decide nonpolar covalent vs. polar covalent vs. ionic, the same judgment call you'll practice in the predictor tool.</p>
+      </div>
+    </div>
+
+    <div class="reveal-card" id="covalent-reveal" tabindex="0" role="button">
+      <div class="hint">Click to check yourself</div>
+      <p style="margin:10px 0 0;"><strong>Quick check:</strong> both simulations above show covalent bonds. What's the one thing that's actually different between them?</p>
+      <div class="answer">In O₂, both atoms are identical, so the shared electrons sit exactly between them — nonpolar. In H₂O, oxygen and hydrogen have different electronegativities, so the shared electrons sit closer to oxygen — polar. Same bond category, different balance of power.</div>
+    </div>
+
+    <p class="bridge">Why this matters for biology: the C–C and C–H bonds that build every carbohydrate, protein, and lipid in your body are mostly nonpolar covalent, while O–H and N–H bonds (common in proteins, DNA, and water) are polar covalent — and that polarity is exactly what sets up hydrogen bonding, coming up next.</p>
+  </section>
+
+  <!-- HYDROGEN BOND -->
+  <section id="hbond" data-section="Hydrogen bonds">
+    <span class="label hbond">Concept 3 · Hydrogen Bonds</span>
+    <h2 class="title">The bond that isn't really "a bond" between atoms</h2>
+    <p class="sub">Here's the trap from question 5: a hydrogen bond isn't a covalent or ionic bond at all. Read closely — this one trips people up.</p>
+
+    <div class="card">
+      <p>A hydrogen bond is a weaker <em>attraction between molecules</em>, not a bond within one. It only happens after a hydrogen atom is already covalently bonded to a strongly electronegative atom — specifically fluorine (F), oxygen (O), or nitrogen (N), sometimes remembered with the mnemonic "FON." That polar covalent bond leaves the hydrogen slightly positive (δ+). That slightly positive hydrogen then gets pulled toward a slightly negative atom (δ−) sitting on a <em>neighboring</em> molecule.</p>
+      <p>So a hydrogen bond needs two ingredients that must already exist before it can form: a polar covalent bond (to create the δ+ hydrogen) and a nearby electronegative atom with a lone pair to attract it. No electrons are transferred and none are newly shared — it's a straightforward electrical attraction, like two magnets drifting toward each other rather than atoms bonding.</p>
+      <p>Individually, a single hydrogen bond is weak — far weaker than a covalent or ionic bond, and easy to break with a little heat or motion. But molecules like water form huge numbers of them at once, and that sheer quantity is what gives water (and DNA, and proteins) their distinctive properties.</p>
+    </div>
+
+    <div class="card analogy">
+      <h3>🧲 The analogy</h3>
+      <p>Imagine two separate magnets (not glued or welded together) just sitting near each other on a table. They'll drift toward each other and stick — but you can pull them apart with way less effort than it'd take to break a weld. Water molecules do this to each other constantly: sticking, breaking apart, re-sticking. That's a hydrogen bond.</p>
+    </div>
+
+    <div class="sim">
+      <div class="sim-label">Simulation · O of one water molecule, H of another</div>
+      <div id="hbond-sim-stage">
+        <!-- Molecule A (donor molecule) -->
+        <div class="hb-atom hb-o" style="left:38px; top:38px;">O</div>
+        <span class="hb-delta neg" style="left:46px; top:14px;">δ−</span>
+        <div class="hb-atom hb-h" style="left:14px; top:98px;">H</div>
+        <div class="hb-atom hb-h" id="hb-donor-h" style="left:98px; top:62px;">H</div>
+        <span class="hb-delta pos" style="left:120px; top:44px;">δ+</span>
+
+        <!-- The hydrogen bond itself: donor H reaching to acceptor O -->
+        <div class="hbond-line" id="hbond-line" style="left:124px; top:74px; width:112px;"></div>
+        <span class="hb-caption-label" id="hbond-caption-label" style="left:124px; top:88px; width:112px;">hydrogen bond</span>
+
+        <!-- Molecule B (acceptor molecule) -->
+        <div class="hb-atom hb-o" id="hb-acceptor-o" style="left:236px; top:53px;">O</div>
+        <div class="lone-pair" style="left:208px; top:69px;"><span></span><span></span></div>
+        <span class="hb-delta neg" style="left:198px; top:88px;">δ−</span>
+        <div class="hb-atom hb-h" style="left:288px; top:22px;">H</div>
+        <div class="hb-atom hb-h" style="left:288px; top:96px;">H</div>
+      </div>
+      <div class="sim-controls">
+        <button class="sim-btn" id="hbond-toggle-btn">Toggle the attraction on/off</button>
+      </div>
+      <p style="text-align:center; color:var(--text-dim); font-size:0.85rem; margin-top:10px;">The dotted line is the hydrogen bond, and it connects two <em>specific</em> atoms: the δ+ hydrogen sticking out of the <strong>left</strong> water molecule, pulled toward the δ− oxygen (and one of its lone pairs) on the <strong>right</strong> water molecule. It's never H-to-H or O-to-O. Toggle it and notice: no atoms transfer, no electrons get permanently shared — it's just attraction.</p>
+    </div>
+
+    <div class="card video">
+      <div class="video-icon">▶</div>
+      <div>
+        <h3 style="margin-bottom:4px;">Watch: Bozeman Science — Water: A Polar Molecule</h3>
+        <p style="margin:0; color:var(--text-dim);"><a href="https://www.bozemanscience.com/water-a-polar-molecule" target="_blank" rel="noopener">bozemanscience.com/water-a-polar-molecule</a> — connects water's polar covalent bonds directly to the hydrogen bonding you just simulated above.</p>
+      </div>
+    </div>
+
+    <div class="reveal-card" id="hbond-reveal" tabindex="0" role="button">
+      <div class="hint">Click to check yourself</div>
+      <p style="margin:10px 0 0;"><strong>Quick check:</strong> is the hydrogen bond in the simulation above happening <em>within</em> one water molecule, or <em>between</em> two separate water molecules?</p>
+      <div class="answer"><em>Between</em> two separate molecules. The O–H bonds inside each water molecule are covalent (polar covalent, specifically) — the hydrogen bond is the weaker attraction that forms <em>after</em> that polarity exists, linking one molecule to its neighbor.</div>
+    </div>
+
+    <p class="bridge">Why this matters for biology: hydrogen bonds are why water has high surface tension and specific heat (cooling your body through sweat), and why DNA's two strands can unzip for replication without breaking a single covalent bond.</p>
+  </section>
+
+  <!-- PREDICTOR TOOL -->
+  <section id="predict" data-section="Predict bond type">
+    <span class="label covalent">Concept 4 · Putting it together</span>
+    <h2 class="title">Predict the bond type from electronegativity</h2>
+    <p class="sub">Electronegativity is a number (on the Pauling scale) that measures how hard an atom pulls on shared electrons. Subtract the two values, and the size of the gap (ΔEN) tells you what kind of bond you'll get. Pick two elements below and watch the prediction build itself.</p>
+
+    <div id="predictor">
+      <div class="predictor-controls">
+        <div class="predictor-field">
+          <label for="atomA">Atom A</label>
+          <select id="atomA">
+            <option value="Na">Na — Sodium (0.93)</option>
+            <option value="K">K — Potassium (0.82)</option>
+            <option value="Ca">Ca — Calcium (1.00)</option>
+            <option value="Mg">Mg — Magnesium (1.31)</option>
+            <option value="H" selected>H — Hydrogen (2.20)</option>
+            <option value="C">C — Carbon (2.55)</option>
+            <option value="S">S — Sulfur (2.58)</option>
+            <option value="N">N — Nitrogen (3.04)</option>
+            <option value="Cl">Cl — Chlorine (3.16)</option>
+            <option value="O">O — Oxygen (3.44)</option>
+            <option value="F">F — Fluorine (3.98)</option>
+          </select>
+        </div>
+        <div class="predictor-field">
+          <label for="atomB">Atom B</label>
+          <select id="atomB">
+            <option value="Na">Na — Sodium (0.93)</option>
+            <option value="K">K — Potassium (0.82)</option>
+            <option value="Ca">Ca — Calcium (1.00)</option>
+            <option value="Mg">Mg — Magnesium (1.31)</option>
+            <option value="H">H — Hydrogen (2.20)</option>
+            <option value="C">C — Carbon (2.55)</option>
+            <option value="S">S — Sulfur (2.58)</option>
+            <option value="N">N — Nitrogen (3.04)</option>
+            <option value="Cl">Cl — Chlorine (3.16)</option>
+            <option value="O" selected>O — Oxygen (3.44)</option>
+            <option value="F">F — Fluorine (3.98)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="en-readout">
+        <span>EN(A) = <b id="enA">—</b></span>
+        <span>EN(B) = <b id="enB">—</b></span>
+        <span>ΔEN = <b id="enDiff">—</b></span>
+      </div>
+
+      <div class="spectrum">
+        <div class="spectrum-marker" id="spectrum-marker" style="left:50%;"></div>
+      </div>
+      <div class="spectrum-zones">
+        <div class="zone-item zone-covalent">
+          <span class="zone-name">Nonpolar covalent</span>
+          <span class="zone-range">ΔEN &lt; 0.4</span>
+        </div>
+        <div class="zone-item zone-polar">
+          <span class="zone-name">Polar covalent</span>
+          <span class="zone-range">0.4 – 1.7</span>
+        </div>
+        <div class="zone-item zone-ionic">
+          <span class="zone-name">Ionic</span>
+          <span class="zone-range">ΔEN &gt; 1.7</span>
+        </div>
+      </div>
+
+      <div class="predictor-result" id="predictor-result">
+        <span class="pill" id="predictor-pill">—</span>
+        <h4 id="predictor-heading">Pick two atoms to see the prediction</h4>
+        <p id="predictor-explanation" style="margin:0; color:var(--text-dim);"></p>
+      </div>
+    </div>
+
+    <div class="reveal-card" style="margin-top:20px;" id="predict-reveal" tabindex="0" role="button">
+      <div class="hint">Click to check yourself</div>
+      <p style="margin:10px 0 0;"><strong>Quick check:</strong> Na (0.93) and Cl (3.16) → ΔEN = 2.23. What bond type, and does that match what you built in the ionic simulation earlier?</p>
+      <div class="answer">ΔEN = 2.23, well above 1.7 → <strong>ionic bond</strong>. That matches the electron-transfer simulation from Concept 1 — the huge pulling-power gap is exactly why the electron fully transferred instead of being shared.</div>
+    </div>
+  </section>
+
+  <!-- POST-ASSESSMENT -->
+  <section id="post" data-section="Post-check">
+    <span class="label assess">Show what you've got</span>
+    <h2 class="title">Post-assessment</h2>
+    <p class="sub">Same style of questions as the pre-check, plus one scenario at the end. This time, try to answer using what you just learned before checking each answer.</p>
+
+    <div class="q" data-qid="post1">
+      <div class="q-prompt">1. Which best describes what happens to sodium and chlorine's electrons when NaCl forms?</div>
+      <div class="choices">
+        <button class="choice" data-correct="false">They share one electron equally</button>
+        <button class="choice" data-correct="true">Sodium's electron transfers completely to chlorine</button>
+        <button class="choice" data-correct="false">No electrons move at all</button>
+      </div>
+      <div class="feedback">Correct — that transfer creates Na⁺ and Cl⁻, which attract each other to form the ionic bond.</div>
+    </div>
+
+    <div class="q" data-qid="post2">
+      <div class="q-prompt">2. Two atoms have a ΔEN of 0.9. What bond type do you predict?</div>
+      <div class="choices">
+        <button class="choice" data-correct="false">Nonpolar covalent</button>
+        <button class="choice" data-correct="true">Polar covalent</button>
+        <button class="choice" data-correct="false">Ionic</button>
+      </div>
+      <div class="feedback">Right — 0.9 falls between 0.4 and 1.7, the polar covalent zone: shared unevenly, but not enough to fully transfer.</div>
+    </div>
+
+    <div class="q" data-qid="post3">
+      <div class="q-prompt">3. In a water molecule, which correctly describes how the charge is distributed?</div>
+      <div class="choices">
+        <button class="choice" data-correct="false">Charge is spread perfectly evenly — water has no partial charges</button>
+        <button class="choice" data-correct="true">Oxygen carries a partial negative charge (δ−) and each hydrogen carries a partial positive charge (δ+)</button>
+        <button class="choice" data-correct="false">Oxygen carries a partial positive charge (δ+) and each hydrogen carries a partial negative charge (δ−)</button>
+      </div>
+      <div class="feedback">Correct — oxygen (EN 3.44) pulls harder on the shared electrons than hydrogen (EN 2.20) does, so the electrons spend more time near O. That unequal pull is what makes water a polar molecule, with O ending up δ− and each H ending up δ+.</div>
+    </div>
+
+    <div class="q" data-qid="post4">
+      <div class="q-prompt">4. Rank these from most to least "equal" electron sharing: (a) C–H bond, ΔEN ≈ 0.35, (b) Na–Cl, ΔEN ≈ 2.23, (c) O–H, ΔEN ≈ 1.24</div>
+      <div class="choices">
+        <button class="choice" data-correct="true">C–H, then O–H, then Na–Cl</button>
+        <button class="choice" data-correct="false">Na–Cl, then O–H, then C–H</button>
+        <button class="choice" data-correct="false">O–H, then C–H, then Na–Cl</button>
+      </div>
+      <div class="feedback">Smaller ΔEN means more equal sharing — so C–H (nearly nonpolar) is most equal, O–H is moderately unequal (polar covalent), and Na–Cl is a full transfer (ionic), the least "equal" of the three.</div>
+    </div>
+
+    <div class="q" data-qid="post5">
+      <div class="q-prompt">5. Scenario: A student heats a sample of DNA in salt water. The two DNA strands separate easily, but the covalent bonds within the sugar-phosphate backbone of each strand stay completely intact. Which explanation best accounts for this?</div>
+      <div class="choices">
+        <button class="choice" data-correct="false">DNA strands are held together by strong ionic bonds that break easily with heat</button>
+        <button class="choice" data-correct="true">The two strands are held together mainly by many hydrogen bonds (weak, individually breakable), while the backbone is held by covalent bonds (strong, requiring far more energy to break)</button>
+        <button class="choice" data-correct="false">Heat has no real effect on any bond type in biological molecules</button>
+      </div>
+      <div class="feedback">Exactly — this is the same logic from the water simulation, scaled up: hydrogen bonds are individually weak and easy to break/reform (great for DNA needing to "unzip" for replication), while covalent bonds in the backbone require much more energy, so they stay intact under normal heating.</div>
+    </div>
+
+    <button class="submit-btn" id="submit-post">Submit and see my score</button>
+    <div id="score-box">
+      <div class="big"><span id="score-num">0</span>/5</div>
+      <p id="score-msg" style="color:var(--text-dim); margin:6px 0 0;"></p>
+    </div>
+  </section>
+
+  <footer>
+    Built for OpenStax Biology 2e, Ch. 2.3 — Chemical Bonds &amp; Electronegativity. Verify all video links before class.
+  </footer>
+
+</div>
+
+<script>
+  // ---------- Progress bar ----------
+  const sections = document.querySelectorAll('section[data-section]');
+  const fill = document.getElementById('progress-fill');
+  const label = document.getElementById('progress-label');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const idx = Array.from(sections).indexOf(e.target);
+        const pct = Math.round(((idx+1)/sections.length)*100);
+        fill.style.width = pct+'%';
+        label.textContent = e.target.dataset.section;
+      }
+    });
+  }, {threshold:0.4});
+  sections.forEach(s=>io.observe(s));
+
+  // ---------- Generic MC/TF question handling ----------
+  document.querySelectorAll('.q').forEach(q=>{
+    const feedback = q.querySelector('.feedback');
+    const choices = q.querySelectorAll('.choice');
+    choices.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(btn.dataset.locked) return;
+        choices.forEach(b=>{
+          b.dataset.locked = 'true';
+          b.disabled = true;
+          if(b.dataset.correct === 'true') b.classList.add('correct');
+          else if(b === btn) b.classList.add('incorrect');
+        });
+        feedback.classList.add('show');
+      });
+    });
+  });
+
+  // ---------- Reveal cards ----------
+  document.querySelectorAll('.reveal-card').forEach(card=>{
+    const toggle = ()=> card.classList.toggle('open');
+    card.addEventListener('click', toggle);
+    card.addEventListener('keypress', e=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggle(); } });
+  });
+
+  // ---------- Ionic simulation (Lewis dot transfer) ----------
+  const naElectron = document.getElementById('na-electron');
+  const naPlus = document.getElementById('na-plus');
+  const clMinus = document.getElementById('cl-minus');
+  const naElectronStart = { left:'75px', top:'44px' };
+  const naElectronTarget = { left:'189px', top:'82px' }; // pairs up with chlorine's lone electron
+  document.getElementById('ionic-transfer-btn').addEventListener('click', ()=>{
+    naElectron.style.left = naElectronTarget.left;
+    naElectron.style.top = naElectronTarget.top;
+    naPlus.classList.add('show');
+    clMinus.classList.add('show');
+  });
+  document.getElementById('ionic-reset-btn').addEventListener('click', ()=>{
+    naElectron.style.left = naElectronStart.left;
+    naElectron.style.top = naElectronStart.top;
+    naPlus.classList.remove('show');
+    clMinus.classList.remove('show');
+  });
+
+  // ---------- Hydrogen bond toggle ----------
+  let hbondOn = true;
+  document.getElementById('hbond-toggle-btn').addEventListener('click', ()=>{
+    hbondOn = !hbondOn;
+    document.getElementById('hbond-line').style.opacity = hbondOn ? '1' : '0';
+    document.getElementById('hbond-caption-label').style.opacity = hbondOn ? '1' : '0';
+    document.getElementById('hb-acceptor-o').style.transform = hbondOn ? 'translateX(0)' : 'translateX(20px)';
+    document.getElementById('hb-acceptor-o').style.transition = 'transform 0.5s ease';
+  });
+
+  // ---------- Predictor tool ----------
+  const EN = { Na:0.93, K:0.82, Ca:1.00, Mg:1.31, H:2.20, C:2.55, S:2.58, N:3.04, Cl:3.16, O:3.44, F:3.98 };
+  const names = { Na:'Sodium', K:'Potassium', Ca:'Calcium', Mg:'Magnesium', H:'Hydrogen', C:'Carbon', S:'Sulfur', N:'Nitrogen', Cl:'Chlorine', O:'Oxygen', F:'Fluorine' };
+  const aSel = document.getElementById('atomA');
+  const bSel = document.getElementById('atomB');
+  const enA = document.getElementById('enA');
+  const enB = document.getElementById('enB');
+  const enDiff = document.getElementById('enDiff');
+  const marker = document.getElementById('spectrum-marker');
+  const pill = document.getElementById('predictor-pill');
+  const heading = document.getElementById('predictor-heading');
+  const explanation = document.getElementById('predictor-explanation');
+
+  function updatePredictor(){
+    const a = aSel.value, b = bSel.value;
+    const va = EN[a], vb = EN[b];
+    const diff = Math.abs(va - vb);
+    enA.textContent = va.toFixed(2);
+    enB.textContent = vb.toFixed(2);
+    enDiff.textContent = diff.toFixed(2);
+
+    // map diff (0 to ~3.15 max range) onto spectrum 0-100%, clamped
+    const pct = Math.min(100, (diff/3.2)*100);
+    marker.style.left = pct+'%';
+
+    let type, color, msg;
+    if(diff < 0.4){
+      type = 'Nonpolar covalent'; color = 'var(--covalent)';
+      msg = `${names[a]} and ${names[b]} pull on electrons almost equally (ΔEN = ${diff.toFixed(2)}), so they share the pair straight down the middle — a nonpolar covalent bond.`;
+    } else if(diff <= 1.7){
+      type = 'Polar covalent'; color = 'var(--hbond)';
+      msg = `${names[a]} and ${names[b]} share electrons, but ${va>vb?names[a]:names[b]} pulls noticeably harder (ΔEN = ${diff.toFixed(2)}), giving the bond a slightly negative end and a slightly positive end — a polar covalent bond.`;
+    } else {
+      type = 'Ionic'; color = 'var(--ionic)';
+      msg = `The pull is so lopsided (ΔEN = ${diff.toFixed(2)}) that ${va>vb?names[b]:names[a]}'s electron fully transfers to ${va>vb?names[a]:names[b]}, creating two oppositely charged ions — an ionic bond.`;
+    }
+    pill.textContent = type;
+    pill.style.background = color;
+    pill.style.color = '#08130f';
+    heading.textContent = `${a}–${b} → ${type} bond`;
+    explanation.textContent = msg;
+  }
+  aSel.addEventListener('change', updatePredictor);
+  bSel.addEventListener('change', updatePredictor);
+  updatePredictor();
+
+  // ---------- Post-assessment scoring ----------
+  document.getElementById('submit-post').addEventListener('click', ()=>{
+    let score = 0, total = 0;
+    document.querySelectorAll('#post .q').forEach(q=>{
+      total++;
+      const chosen = q.querySelector('.choice.incorrect');
+      const anyAnswered = q.querySelector('.choice[data-locked]');
+      if(anyAnswered && !chosen) score++;
+    });
+    document.getElementById('score-num').textContent = score;
+    document.querySelector('#score-box .big').innerHTML = score+'<span style="font-size:1.2rem; color:var(--text-dim);">/'+total+'</span>';
+    let msg;
+    if(score === total) msg = "Perfect — you're predicting bond types like a pro. Ready for macromolecules next.";
+    else if(score >= total-2) msg = "Strong grasp overall — revisit the reveal cards for any question you missed.";
+    else msg = "Worth another pass through the concept sections, especially the predictor tool, before moving on.";
+    document.getElementById('score-msg').textContent = msg;
+    document.getElementById('score-box').classList.add('show');
+    document.getElementById('submit-post').disabled = true;
+  });
+</script>
+
+</body>
+</html>
